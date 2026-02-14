@@ -49,6 +49,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Saturday, 1 Jan 2025"
@@ -430,6 +431,20 @@
                 android:textStyle="bold"
                 app:layout_constraintTop_toBottomOf="@id/investmentScroll"
                 app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/tvSeeAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="336dp"
+                android:layout_marginTop="20dp"
+                android:text="@string/see_all"
+                android:textColor="@color/secondaryColor"
+                android:textSize="12sp"
+                android:clickable="true"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/investmentScroll" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/news_recycler"

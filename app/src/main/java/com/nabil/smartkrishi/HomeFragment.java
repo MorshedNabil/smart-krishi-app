@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -25,9 +26,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
@@ -35,17 +39,23 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
     RecyclerView recyclerView;
+    TextView tvDate;
+    TextView tvSeeAll;
     ArrayList<NewsItem> newsListHome = new ArrayList<>();
     SunPathView sunView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
         View myView = inflater.inflate(R.layout.fragment_home, container, false);
 
+        // =================== All function calls and declaration ====================
         recyclerView = myView.findViewById(R.id.news_recycler);
         sunView = myView.findViewById(R.id.dotted_curve);
+        tvDate = myView.findViewById(R.id.tvDate);
+        tvSeeAll = myView.findViewById(R.id.tvSeeAll);
+
+        setCurrentDate();
 
         fetchNewsData();
         NewsAdapter myAdapter = new NewsAdapter(newsListHome);
@@ -59,6 +69,13 @@ public class HomeFragment extends Fragment {
         animateSun(progress);
 
         return myView;
+    }
+
+    private void setCurrentDate() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.getDefault());
+        String currentDate = dateFormat.format(new Date());
+
+        tvDate.setText(currentDate);
     }
 
 
