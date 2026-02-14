@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name" translatable="false">Smart Krishi</string>
+    <!-- Login Screen Strings -->
+    <string name="login">Log in</string>
+    <string name="login_prompt_signup"><u>Don\'t have an account?</u></string>
+    <string name="info_msg_otp">Please enter the 4-digit OTP sent to your registered phone number</string>
+    <string name="phone">Phone</string>
+    <string name="getOTP">Get OTP</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

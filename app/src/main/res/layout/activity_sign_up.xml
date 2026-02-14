@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2E5A42">
+
+    <ImageView
+        android:id="@+id/iv_bottom_illustration"
+        android:layout_width="471dp"
+        android:layout_height="377dp"
+        android:layout_marginTop="326dp"
+        android:alpha="0.2"
+        android:scaleType="centerCrop"
+        android:src="@drawable/farming_illustration"
+        app:layout_constraintBaseline_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top_card"
+        tools:ignore="MissingConstraints" />
+
+    <View
+        android:id="@+id/top_card"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:background="@drawable/white_header_bg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@id/top_card"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/top_card">
+
+        <ImageView
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:src="@drawable/smart_krishi_logo"
+            android:scaleType="centerCrop"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_card">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="24dp">
+
+            <TextView
+                android:id="@+id/tv_signup_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sign up"
+                android:textColor="#FFFFFF"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/lbl_phone"
+                style="@style/LabelStyle"
+                android:text="Phone"
+                app:layout_constraintTop_toBottomOf="@id/tv_signup_title"
+                tools:ignore="MissingConstraints" />
+
+            <LinearLayout
+                android:id="@+id/input_phone"
+                style="@style/InputContainerStyle"
+                app:layout_constraintTop_toBottomOf="@id/lbl_phone"
+                tools:ignore="MissingConstraints">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="8dp"
+                    android:text="+880 ⌵"
+                    android:textColor="#FFFFFF" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginVertical="8dp"
+                    android:background="#FFFFFF" />
+
+                <EditText
+                    style="@style/InputContainerStyle"
+                    android:layout_width="248dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter phone number"
+                    android:inputType="phone" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/lbl_nid"
+                style="@style/LabelStyle"
+                android:text="Nid"
+                app:layout_constraintTop_toBottomOf="@id/input_phone"
+                tools:ignore="MissingConstraints" />
+
+            <EditText
+                android:id="@+id/input_nid"
+                style="@style/InputContainerStyle"
+                android:hint="Enter NID number"
+                app:layout_constraintTop_toBottomOf="@id/lbl_nid"
+                tools:ignore="MissingConstraints" />
+
+            <TextView
+                android:id="@+id/lbl_division"
+                style="@style/LabelStyle"
+                android:text="Division"
+                app:layout_constraintTop_toBottomOf="@id/input_nid"
+                tools:ignore="MissingConstraints" />
+
+            <Spinner
+                android:id="@+id/sp_division"
+                style="@style/InputContainerStyle"
+                app:layout_constraintTop_toBottomOf="@id/lbl_division"
+                tools:ignore="MissingConstraints" />
+
+            <TextView
+                android:id="@+id/lbl_district"
+                style="@style/LabelStyle"
+                android:text="District"
+                app:layout_constraintTop_toBottomOf="@id/sp_division"
+                tools:ignore="MissingConstraints" />
+
+            <Spinner
+                android:id="@+id/sp_district"
+                style="@style/InputContainerStyle"
+                app:layout_constraintTop_toBottomOf="@id/lbl_district"
+                tools:ignore="MissingConstraints" />
+
+
+            <TextView
+                android:id="@+id/lbl_village"
+                style="@style/LabelStyle"
+                android:text="Village Name"
+                app:layout_constraintTop_toBottomOf="@id/sp_district"
+                tools:ignore="MissingConstraints" />
+
+            <EditText
+                android:id="@+id/input_village"
+                style="@style/InputContainerStyle"
+                android:hint="Enter village name"
+                app:layout_constraintTop_toBottomOf="@id/lbl_village"
+                tools:ignore="MissingConstraints" />
+
+            <TextView
+                android:id="@+id/lbl_role"
+                style="@style/LabelStyle"
+                android:text="Sign up as"
+                app:layout_constraintTop_toBottomOf="@id/input_village"
+                tools:ignore="MissingConstraints" />
+
+            <RadioGroup
+                android:id="@+id/rg_role"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/lbl_role">
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="#FFFFFF"
+                    android:text="Farmer"
+                    android:textColor="#FFFFFF" />
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="#FFFFFF"
+                    android:text="Vendor"
+                    android:textColor="#FFFFFF" />
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="#FFFFFF"
+                    android:text="Buyer"
+                    android:textColor="#FFFFFF" />
+            </RadioGroup>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_signup"
+                android:layout_width="180dp"
+                android:layout_height="55dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/button_rounded"
+                android:text="Sign up"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rg_role" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/home"
+        android:title="Home" />
+    <item
+        android:id="@+id/nav_loan"
+        android:icon="@drawable/bank"
+        android:title="Bank Loan" />
+    <item
+        android:id="@+id/nav_products"
+        android:icon="@drawable/product"
+        android:title="My Products" />
+    <item
+        android:id="@+id/nav_notifications"
+        android:icon="@drawable/bell"
+        android:title="Notifications" />
+</menu>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- When the switch is checked (On) -->
+    <item
+        android:drawable="@drawable/thumbtrue"
+        android:state_checked="true" />
+    <!-- when the switch is unchecked (Off) -->
+    <item
+        android:drawable="@drawable/thumbfalse"
+        android:state_checked="false"/>
+</selector>

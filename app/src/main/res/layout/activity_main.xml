@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2E5A42">
+
+    <ImageView
+        android:id="@+id/footer_illustration"
+        android:layout_width="471dp"
+        android:layout_height="377dp"
+        android:layout_marginTop="35dp"
+        android:alpha="0.3"
+        android:scaleType="centerCrop"
+        android:src="@drawable/farming_illustration"
+        app:layout_constraintBaseline_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phone_input_container"
+        tools:ignore="MissingConstraints" />
+
+    <View
+        android:id="@+id/top_card"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:background="@drawable/white_header_bg"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@id/top_card"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ImageView
+            android:id="@+id/logoImageView"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/smart_krishi_logo" />
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_login_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/login"
+        android:textColor="#FFFFFF"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_card" />
+
+    <!-- THIS IS THE NEW SWITCH BUTTON -->
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/lang_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:textOn="EN"
+        android:textOff="BN"
+        app:showText="true"
+        app:track="@drawable/track_selector"
+        android:thumb="@drawable/thumb_selector"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:checked="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_login_title"
+        app:layout_constraintBottom_toBottomOf="@id/tv_login_title" />
+
+    <TextView
+        android:id="@+id/tv_phone_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/phone"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@id/tv_login_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_login_title" />
+
+    <LinearLayout
+        android:id="@+id/phone_input_container"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/input_field_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_phone_label"
+        app:layout_constraintTop_toBottomOf="@id/tv_phone_label">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="+880 ⌵"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginVertical="8dp"
+            android:background="#FFFFFF" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:hint="Enter phone number"
+            android:inputType="phone"
+            android:paddingStart="12dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#E0E0E0" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_signup_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/login_prompt_signup"
+        android:textColor="@color/textColorPrimary"
+        style="?attr/borderlessButtonStyle"
+        app:layout_constraintStart_toStartOf="@id/phone_input_container"
+        app:layout_constraintTop_toBottomOf="@id/phone_input_container" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_get_otp"
+        android:layout_width="160dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="48dp"
+        android:background="@drawable/button_rounded"
+        android:elevation="4dp"
+        android:text="@string/getOTP"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:shadowRadius="2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_signup_link" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
