@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "788796336162",
+    "project_id": "smart-krishi-app-939dc",
+    "storage_bucket": "smart-krishi-app-939dc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:788796336162:android:4aad802dc19318b0c6027b",
+        "android_client_info": {
+          "package_name": "com.nabil.smartkrishi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCs4UcLhpygpKJks1IQzowcCNmDW_0PFR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
