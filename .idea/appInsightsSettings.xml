@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.nabil.smartkrishi" />
+                  <option name="mobileSdkAppId" value="1:788796336162:android:4aad802dc19318b0c6027b" />
+                  <option name="projectId" value="smart-krishi-app-939dc" />
+                  <option name="projectNumber" value="788796336162" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

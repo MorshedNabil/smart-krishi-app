@@ -2,39 +2,78 @@ package com.nabil.smartkrishi;
 
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+
 public class SignUp extends AppCompatActivity {
+    Spinner divisionSpinner, districtSpinner;
+    EditText inputPhone, inputNid, inputVillage;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        // 1. Find the Spinner by its ID
-        Spinner divisionSpinner = findViewById(R.id.sp_division);
-        Spinner districtSpinner = findViewById(R.id.sp_district);
+        divisionSpinner = findViewById(R.id.sp_division);
+        districtSpinner = findViewById(R.id.sp_district);
+        inputPhone = findViewById(R.id.input_phone);
+        inputNid = findViewById(R.id.input_nid);
+        inputVillage = findViewById(R.id.input_village);
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
 
-        // 2. Create the list of items
+        // ===================== Adding spinners data =======================
         String[] divisions = new String[]{"Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh"};
         String[] districts = new String[]{"Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh"};
 
-        // 3. Create an ArrayAdapter
-        // The second argument is a default layout provided by Android for how each item in the dropdown will look.
-        // The third argument is the data source.
         ArrayAdapter<String> adapter_divisions = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, divisions);
         ArrayAdapter<String> adapter_district = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, districts);
 
-        // 4. Specify the layout to use when the list of choices appears
         adapter_divisions.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         adapter_district.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        // 5. Apply the adapter to the spinner
         divisionSpinner.setAdapter(adapter_divisions);
         districtSpinner.setAdapter(adapter_district);
+        // =================================================================
+
+        userRegister();
 
 
-        // --- Your other code ---
     }
+
+    private void userRegister() {
+
+        String phone = inputPhone.getText().toString().trim();
+        String nidNumber = inputNid.getText().toString().trim();
+        String villageName = inputVillage.getText().toString().trim();
+        String division = divisionSpinner.getSelectedItem().toString().trim();
+        String district = districtSpinner.getSelectedItem().toString().trim();
+
+        if(nidNumber.isEmpty()){
+            inputNid.setError("Please enter all the fields");
+            inputNid.requestFocus();
+            return;
+        }
+        else if(villageName.isEmpty()){
+            inputVillage.setError("Please enter Village fields");
+            inputVillage.requestFocus();
+            return;
+        }
+        else if(phone.isEmpty()){
+            inputPhone.setError("Please enter Phone fields");
+            inputPhone.requestFocus();
+            return;
+        }
+
+    }
+
 }
