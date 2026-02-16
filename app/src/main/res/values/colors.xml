@@ -5,4 +5,6 @@
     <color name="textColorPrimary">#FFFFFF</color>
     <color name="primaryColor">#31694E</color>
     <color name="secondaryColor">#BBC863</color>
+    <color name="pin_view_text_color">#222222</color>
+    <color name="pin_view_cursor_color">#C2BFBF</color>
 </resources>

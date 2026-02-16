@@ -1,7 +1,10 @@
 package com.nabil.smartkrishi;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -12,10 +15,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class SignUp extends AppCompatActivity {
     Spinner divisionSpinner, districtSpinner;
     EditText inputPhone, inputNid, inputVillage;
+    Button SignUpBtn;
     private FirebaseAuth mAuth;
 
     @Override
@@ -28,6 +33,8 @@ public class SignUp extends AppCompatActivity {
         inputPhone = findViewById(R.id.input_phone);
         inputNid = findViewById(R.id.input_nid);
         inputVillage = findViewById(R.id.input_village);
+        SignUpBtn = findViewById(R.id.btn_signup);
+
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
@@ -47,6 +54,15 @@ public class SignUp extends AppCompatActivity {
 
         userRegister();
 
+        // ============================ Signup Button =====================================
+        SignUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+            }
+        });
+
 
     }
 
@@ -59,21 +75,38 @@ public class SignUp extends AppCompatActivity {
         String district = districtSpinner.getSelectedItem().toString().trim();
 
         if(nidNumber.isEmpty()){
-            inputNid.setError("Please enter all the fields");
+            inputNid.setError("Please enter NID number");
             inputNid.requestFocus();
             return;
         }
         else if(villageName.isEmpty()){
-            inputVillage.setError("Please enter Village fields");
+            inputVillage.setError("Please enter Village name");
             inputVillage.requestFocus();
             return;
         }
         else if(phone.isEmpty()){
-            inputPhone.setError("Please enter Phone fields");
+            inputPhone.setError("Please enter Phone Number");
             inputPhone.requestFocus();
             return;
         }
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if(currentUser != null){
+            sendToMain();
+        }
+    }
+
+    private void sendToMain() {
+        Intent intent = new Intent(SignUp.this, OnBoardActivity.class);
+        startActivity(intent);
+        finish();
     }
 
 }

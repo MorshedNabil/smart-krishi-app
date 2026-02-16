@@ -71,13 +71,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <EditText android:id="@+id/otp1" style="@style/OtpBoxStyle" />
+        <EditText android:id="@+id/otp1" style="@style/OtpBoxStyle" android:inputType="number"/>
         <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#FFFFFF" />
-        <EditText android:id="@+id/otp2" style="@style/OtpBoxStyle" />
+        <EditText android:id="@+id/otp2" style="@style/OtpBoxStyle" android:inputType="number"/>
         <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#FFFFFF" />
-        <EditText android:id="@+id/otp3" style="@style/OtpBoxStyle" />
+        <EditText android:id="@+id/otp3" style="@style/OtpBoxStyle" android:inputType="number"/>
         <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#FFFFFF" />
-        <EditText android:id="@+id/otp4" style="@style/OtpBoxStyle" />
+        <EditText android:id="@+id/otp4" style="@style/OtpBoxStyle" android:inputType="number"/>
     </LinearLayout>
 
     <LinearLayout

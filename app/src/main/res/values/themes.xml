@@ -45,7 +45,13 @@
         <item name="android:textSize">24sp</item>
         <item name="android:textStyle">bold</item>
     </style>
+    <!-- res/values/styles.xml -->
+    <style name="Widget.App.PinView" parent="Widget.AppCompat.EditText">
 
+        <item name="android:textColor">@color/pin_view_text_color</item>
+        <item name="cursorColor">@color/pin_view_cursor_color</item>
+
+    </style>
 
 
 </resources>

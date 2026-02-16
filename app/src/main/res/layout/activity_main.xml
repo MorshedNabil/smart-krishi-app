@@ -120,6 +120,7 @@
             android:background="#FFFFFF" />
 
         <EditText
+            android:id="@+id/input_phone_login"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
@@ -157,5 +158,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_signup_link" />
+
+    <TextView
+        android:id="@+id/tv_error_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="Error message will appear here"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/phone_input_container"
+        app:layout_constraintStart_toStartOf="@id/phone_input_container"
+        app:layout_constraintTop_toBottomOf="@id/btn_get_otp"
+        tools:visibility="invisible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
