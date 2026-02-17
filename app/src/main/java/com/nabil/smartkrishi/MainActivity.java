@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Intent OTPintent = new Intent(MainActivity.this, OtpVerification.class);
-                        OTPintent.putExtra("auth", s);
+                        OTPintent.putExtra("otpPin", s);
                         startActivity(OTPintent);
                     }
                 }, 10000);
