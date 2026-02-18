@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         Auth = FirebaseAuth.getInstance();
 
-        // Set an OnClickListener on the button
+        // Set an OnClickListener on the button 'get otp'
         getOtpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Intent OTPintent = new Intent(MainActivity.this, OtpVerification.class);
-                        OTPintent.putExtra("otpPin", s);
+                        OTPintent.putExtra("verification_pin", s);
                         startActivity(OTPintent);
                     }
                 }, 10000);
@@ -107,8 +108,8 @@ public class MainActivity extends AppCompatActivity {
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 3. Call the function to navigate to the Signup activity
-                openSignupActivity();
+                Intent intent = new Intent(MainActivity.this, SignUp.class);
+                startActivity(intent);
             }
         });
 
@@ -137,26 +138,17 @@ public class MainActivity extends AppCompatActivity {
     }
     // ============================================================
 
-    /**
-     * Creates an Intent to navigate from the current activity to SignupActivity.
-     */
-    private void openSignupActivity() {
-        // Create an Intent to specify which activity to start
-        Intent intent = new Intent(MainActivity.this, SignUp.class);
-        startActivity(intent);
+    // =========== onStart() uses when user is logged in previously =====================
+    @Override
+    public void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = Auth.getCurrentUser();
+
+        if(currentUser != null){
+            sendToMain();
+        }
     }
 
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        // Check if user is signed in (non-null) and update UI accordingly.
-//        FirebaseUser currentUser = Auth.getCurrentUser();
-//
-//        if(currentUser != null){
-//            sendToMain();
-//        }
-//    }
-//
     private void sendToMain() {
         Intent intent = new Intent(MainActivity.this, OnBoardActivity.class);
         startActivity(intent);

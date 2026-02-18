@@ -33,6 +33,18 @@
 
     </LinearLayout>
 
+    <ImageView
+        android:layout_width="480dp"
+        android:layout_height="258dp"
+        android:alpha="0.3"
+        android:scaleType="centerCrop"
+        android:src="@drawable/farming_illustration"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/helperLayout"
+        app:layout_constraintVertical_bias="1.0"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp" />
+
     <TextView
         android:id="@+id/tvLogin"
         android:layout_width="wrap_content"
@@ -117,17 +129,19 @@
         app:layout_constraintTop_toBottomOf="@id/helperLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+    <Button
+        android:id="@+id/btnrResendOtp"
+        android:layout_width="180dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="48dp"
+        style="?attr/borderlessButtonStyle"
+        android:text="@string/resend_otp"
+        android:textAllCaps="false"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@id/btnLogin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <ImageView
-        android:layout_width="480dp"
-        android:layout_height="258dp"
-        android:alpha="0.3"
-        android:scaleType="centerCrop"
-        android:src="@drawable/farming_illustration"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/helperLayout"
-        app:layout_constraintVertical_bias="1.0"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
