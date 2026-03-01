@@ -1,5 +1,3 @@
-# smart-krishi-app
-
 # 🌾 Smart Krishi App
 
 ## 📌 Overview
