@@ -42,28 +42,14 @@ Our goal is to reduce price exploitation and ensure farmers receive the value th
 ---
 
 ## 🏗 System Architecture
-Mobile App (Java)
-|
-v
-FastAPI Backend
-|
-|----> ML Price Prediction Model (Python)
-|
-v
-MySQL Database
+flowchart TD
+    A[📱 Mobile App\n(Java / Android)] -->|REST API (JSON)| B[⚙️ Backend Server\n(FastAPI)]
 
-## 📸 App Screenshots
-<p align="center">
-  <img width="300" alt="krishi" src="https://github.com/user-attachments/assets/6240c610-5360-43c7-ab99-5fe1f469a656" />
-  <img width="300" alt="Splash Screen" src="https://github.com/user-attachments/assets/26beadb1-96f8-40c3-83b5-46465d362398" />
-  <img width="300" alt="Sign Up" src="https://github.com/user-attachments/assets/0ba84356-3eb2-4f40-afdf-3f44e7c67282" />
-</p>
-<p align="center">
-  <img width="300" alt="OTP" src="https://github.com/user-attachments/assets/5fdc68ed-804e-49cb-8ddc-e97dda55b697" />
-  <img width="300" alt="My products" src="https://github.com/user-attachments/assets/696da055-0071-47fa-95ae-02a1831bf5e5" />
-  <img width="300" alt="Home page (farmer)" src="https://github.com/user-attachments/assets/d68247ff-266d-41ff-a3ba-d6ec1d2c7bd7" />
-  <img width="300" alt="Add product" src="https://github.com/user-attachments/assets/8366f9c2-ea2d-41eb-be0f-11a0103070a9" />
-</p>
+    B -->|Request Features| C[🧠 ML Price Prediction Model\n(Python)]
+    C -->|Predicted Price| B
+
+    B -->|Read / Write| D[🗄️ MySQL Database]
+    D -->|Market & Historical Data| B
 
 ## 🚀 Future Improvements
 
