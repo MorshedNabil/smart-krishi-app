@@ -44,8 +44,8 @@ Our goal is to reduce price exploitation and ensure farmers receive the value th
 ## 🏗 System Architecture
 ```mermaid
 flowchart TD
-    A[Mobile App] --> B[Backend Server]
-    B --> C[ML Price Prediction Model]
+    A[Mobile App - Java Android] --> B[Backend Server - FastAPI]
+    B --> C[ML Price Prediction Model - Python]
     C --> B
     B --> D[MySQL Database]
 ```
