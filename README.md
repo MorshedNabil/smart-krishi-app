@@ -42,6 +42,7 @@ Our goal is to reduce price exploitation and ensure farmers receive the value th
 ---
 
 ## 🏗 System Architecture
+```mermaid
 flowchart TD
     A[📱 Mobile App\n(Java / Android)] -->|REST API (JSON)| B[⚙️ Backend Server\n(FastAPI)]
 
@@ -50,7 +51,7 @@ flowchart TD
 
     B -->|Read / Write| D[🗄️ MySQL Database]
     D -->|Market & Historical Data| B
-
+```
 ## 🚀 Future Improvements
 
 - Real-time market price updates
