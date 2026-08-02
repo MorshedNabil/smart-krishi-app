@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,11 +18,14 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.HashMap;
+
 public class SignUp extends AppCompatActivity {
     Spinner divisionSpinner, districtSpinner;
     EditText inputPhone, inputNid, inputVillage;
     Button SignUpBtn;
     private FirebaseAuth mAuth;
+    HashMap<String, String> userDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +56,15 @@ public class SignUp extends AppCompatActivity {
         districtSpinner.setAdapter(adapter_district);
         // =================================================================
 
-        userRegister();
-
         // ============================ Signup Button =====================================
         SignUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                userDetails = userRegister();
 
+                if(userDetails!= null) {
+                    // Register the user and go to login page.
+                }
 
             }
         });
@@ -66,7 +72,7 @@ public class SignUp extends AppCompatActivity {
 
     }
 
-    private void userRegister() {
+    private HashMap<String, String> userRegister() {
 
         String phone = inputPhone.getText().toString().trim();
         String nidNumber = inputNid.getText().toString().trim();
@@ -77,18 +83,36 @@ public class SignUp extends AppCompatActivity {
         if(nidNumber.isEmpty()){
             inputNid.setError("Please enter NID number");
             inputNid.requestFocus();
-            return;
+            return null;
         }
         else if(villageName.isEmpty()){
             inputVillage.setError("Please enter Village name");
             inputVillage.requestFocus();
-            return;
+            return null;
         }
         else if(phone.isEmpty()){
             inputPhone.setError("Please enter Phone Number");
             inputPhone.requestFocus();
-            return;
+            return null;
         }
+        else if (division.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Please Select your Division", Toast.LENGTH_LONG).show();
+            return null;
+        }
+        else if (district.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Please Select your District", Toast.LENGTH_LONG).show();
+            return null;
+        }
+
+        // If all data are provided by user then sighup
+        HashMap<String, String> user = new HashMap<>();
+        user.put("phone", phone);
+        user.put("nidNumber", nidNumber);
+        user.put("villageName", villageName);
+        user.put("division", division);
+        user.put("district", district);
+
+        return user;
 
     }
 

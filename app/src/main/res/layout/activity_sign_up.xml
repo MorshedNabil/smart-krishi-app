@@ -76,7 +76,7 @@
                 tools:ignore="MissingConstraints" />
 
             <LinearLayout
-                android:id="@+id/input_phone"
+                android:id="@+id/input_phone_layout"
                 style="@style/InputContainerStyle"
                 app:layout_constraintTop_toBottomOf="@id/lbl_phone"
                 tools:ignore="MissingConstraints">
@@ -108,7 +108,7 @@
                 android:id="@+id/lbl_nid"
                 style="@style/LabelStyle"
                 android:text="Nid"
-                app:layout_constraintTop_toBottomOf="@id/input_phone"
+                app:layout_constraintTop_toBottomOf="@id/input_phone_layout"
                 tools:ignore="MissingConstraints" />
 
             <EditText
