@@ -6,12 +6,12 @@ import androidx.compose.runtime.Composable
 private val LightColors = lightColorScheme(
     primary = GreenPrimary,
     secondary = YellowAccent,
-    background = Background,
+    background = BackgroundCream,
     surface = Surface
 )
 
 @Composable
-fun SmartKrishiV1Theme(
+fun SmartKrishiTheme(
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
