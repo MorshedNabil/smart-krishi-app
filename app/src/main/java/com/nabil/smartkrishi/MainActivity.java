@@ -2,7 +2,7 @@ package com.nabil.smartkrishi;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
             public void onVerificationFailed(@NonNull FirebaseException e) {
                 errorMsg.setVisibility(View.VISIBLE);
                 errorMsg.setText(e.getMessage());
+                Log.d("Verification Error", "onVerificationFailed: " + e.getMessage());
 
             }
 
@@ -92,16 +93,9 @@ public class MainActivity extends AppCompatActivity {
             public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                 super.onCodeSent(s, forceResendingToken);
 
-                // Sometimes the code doesn't detect automatically
-                // Call the function to navigate to the next activity
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent OTPintent = new Intent(MainActivity.this, OtpVerification.class);
-                        OTPintent.putExtra("verification_pin", s);
-                        startActivity(OTPintent);
-                    }
-                }, 10000);
+                Intent OTPintent = new Intent(MainActivity.this, OtpVerification.class);
+                OTPintent.putExtra("verification_pin", s);
+                startActivity(OTPintent);
             }
         };
 

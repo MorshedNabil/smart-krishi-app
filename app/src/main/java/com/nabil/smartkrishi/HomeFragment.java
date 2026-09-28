@@ -3,6 +3,7 @@ package com.nabil.smartkrishi;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,7 +39,9 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
         // Required empty public constructor
     }
+
     RecyclerView recyclerView;
+    CardView profileCard;
     TextView tvDate;
     TextView tvSeeAll;
     ArrayList<NewsItem> newsListHome = new ArrayList<>();
@@ -54,6 +57,7 @@ public class HomeFragment extends Fragment {
         sunView = myView.findViewById(R.id.dotted_curve);
         tvDate = myView.findViewById(R.id.tvDate);
         tvSeeAll = myView.findViewById(R.id.tvSeeAll);
+        profileCard = myView.findViewById(R.id.profilePicCard);
 
         setCurrentDate();
 
@@ -62,9 +66,17 @@ public class HomeFragment extends Fragment {
         recyclerView.setAdapter(myAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        // ========================= Profile Card ===========================
+        profileCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Handle the click event here
+                Toast.makeText(getActivity(), "Profile Card Clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
-        // ========================= Sun UI ===========================
+                // ========================= Sun UI ===========================
         float progress = updateSunUI("06:30", "18:30");
         animateSun(progress);
 
@@ -126,7 +138,7 @@ public class HomeFragment extends Fragment {
                 // Optionally, show a toast message to the user
                 Toast.makeText(getActivity(), "Failed to load news", Toast.LENGTH_SHORT).show();
             }
-        }){
+        }) {
 
             // *** THIS IS THE FIX FOR THE 403 FORBIDDEN ERROR ***
             @Override

@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace 'com.nabil.smartkrishi'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.nabil.smartkrishi"
         minSdk 26
-        targetSdk 35
+        targetSdk 36
         versionCode 1
         versionName "1.0"
 
@@ -42,6 +42,7 @@ android {
 
 dependencies {
 
+    implementation libs.activity.ktx
     implementation libs.appcompat
     implementation libs.core.ktx
     implementation libs.material
@@ -56,13 +57,12 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.8'
 
     // ============== Firebase Dependencies =============
-    implementation platform('com.google.firebase:firebase-bom:34.9.0') // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:34.19.0') // Import the BoM for the Firebase platform
     implementation libs.firebase.auth
     implementation libs.firebase.analytics
 
     // ============== Compose Dependencies =============
-    def composeBom = platform("androidx.compose:compose-bom:2024.12.01") // Using the Compose BOM so all Compose libraries stay version-compatible.
-
+    def composeBom = platform("androidx.compose:compose-bom:2024.12.01") // Using the Compose BOM so all Compose libraries stay version-compatible
     implementation(composeBom)
     androidTestImplementation(composeBom)
     implementation("androidx.compose.ui:ui")

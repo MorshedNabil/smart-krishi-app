@@ -232,7 +232,7 @@ fun InputFields(
         OutlinedTextField(
             value = phoneNumber,
             onValueChange = {
-                onPhoneChange(it) // callback function to update the phone number
+                onPhoneChange(it) // callback function to update the phone number. Sends the new phone number user typed upward to it's parent (ProfileContent)
             },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(14.dp),
@@ -288,7 +288,7 @@ fun InputFields(
             OutlinedTextField(
                 value = selectedLocation,
                 onValueChange = {
-                    onVillageChange(it) // callback function to update the village
+                    onVillageChange(it) // callback function to update the village. Sends the new village user typed upward to it's parent (ProfileContent)
                 },
                 readOnly = true,
                 modifier = Modifier.fillMaxWidth(),
@@ -370,7 +370,7 @@ fun SaveChangeButton(
     // --- Save Changes Button ---
     Button(
         onClick = {
-            onSaveClick() // callback function to save changes. Saves the changes to the database which have currently in the uiState
+            onSaveClick() // callback function to save changes. Saves the changes to the database which have currently in the uiState. Does not need any parameters because it pass the user event only. The parent has the data already.
         },
         modifier = Modifier
             .fillMaxWidth()

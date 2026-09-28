@@ -28,7 +28,7 @@ import com.google.firebase.auth.PhoneAuthProvider;
 
 public class OtpVerification extends AppCompatActivity {
 
-    EditText otp1, otp2, otp3, otp4;
+    EditText otp1, otp2, otp3, otp4, otp5, otp6;
     Button loginBtn;
     private FirebaseAuth fAuth;
 
@@ -43,6 +43,8 @@ public class OtpVerification extends AppCompatActivity {
         otp2 = findViewById(R.id.otp2);
         otp3 = findViewById(R.id.otp3);
         otp4 = findViewById(R.id.otp4);
+        otp5 = findViewById(R.id.otp5);
+        otp6 = findViewById(R.id.otp6);
         loginBtn = findViewById(R.id.btnLogin);
         fAuth = FirebaseAuth.getInstance();
 
@@ -132,9 +134,55 @@ public class OtpVerification extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                if(s.length() == 1){
+                    otp5.requestFocus();
+                }
+                else if(s.length() == 0){
+                    // when user removing the number from the field go to the previous field
+                    otp3.requestFocus();
+                }
+            }
+        });
+
+        otp5.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() == 1){
+                    otp6.requestFocus();
+                }
+                else if(s.length() == 0){
+                    // when user removing the number from the field go to the previous field
+                    otp4.requestFocus();
+                }
+            }
+        });
+
+        otp6.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
                  if(s.length() == 0){
                      // when user removing the number from the field go to the previous field
-                    otp3.requestFocus();
+                    otp5.requestFocus();
                  }
             }
         });
@@ -142,13 +190,14 @@ public class OtpVerification extends AppCompatActivity {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!otp4.getText().toString().isEmpty()){
+                if(!otp6.getText().toString().isEmpty()){
                     String OTP = "";
-                    OTP = otp1.getText().toString() + otp2.getText().toString() + otp3.getText().toString() + otp4.getText().toString();
+                    OTP = otp1.getText().toString() + otp2.getText().toString() + otp3.getText().toString() + otp4.getText().toString() + otp5.getText().toString() + otp6.getText().toString();
 
                     // OTP matching code
                     if(!OTP.isEmpty()){
-                        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(OTP, myOtp);
+                        assert myOtp != null;
+                        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(myOtp, OTP);
                         logIn(credential);
                     }
                     else{
@@ -178,6 +227,7 @@ public class OtpVerification extends AppCompatActivity {
                 }
                 else{
                     Toast.makeText(OtpVerification.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                    Log.d("Verification Error", "onComplete: " + task.getException().getMessage());
                 }
             }
         });
