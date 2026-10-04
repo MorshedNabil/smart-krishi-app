@@ -16,7 +16,7 @@ fun SmartKrishiTheme(
 ) {
     MaterialTheme(
         colorScheme = LightColors,
-        typography = AppTypography,
+        typography = Typography,
         content = content
     )
 }

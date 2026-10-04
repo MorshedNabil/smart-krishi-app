@@ -16,7 +16,7 @@
         android:theme="@style/Theme.SmartKrishi"
         tools:targetApi="31">
         <activity
-            android:name=".profile.ProfileActivity"
+            android:name=".features.profile.ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".OnBoardActivity"
