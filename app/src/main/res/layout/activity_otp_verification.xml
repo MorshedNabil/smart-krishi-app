@@ -78,7 +78,7 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/otp_container"
         android:orientation="horizontal"
-        android:weightSum="4"
+        android:weightSum="6"
         app:layout_constraintTop_toBottomOf="@id/tvOtpLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -90,6 +90,10 @@
         <EditText android:id="@+id/otp3" style="@style/OtpBoxStyle" android:inputType="number"/>
         <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#FFFFFF" />
         <EditText android:id="@+id/otp4" style="@style/OtpBoxStyle" android:inputType="number"/>
+        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#FFFFFF" />
+        <EditText android:id="@+id/otp5" style="@style/OtpBoxStyle" android:inputType="number"/>
+        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#FFFFFF" />
+        <EditText android:id="@+id/otp6" style="@style/OtpBoxStyle" android:inputType="number"/>
     </LinearLayout>
 
     <LinearLayout

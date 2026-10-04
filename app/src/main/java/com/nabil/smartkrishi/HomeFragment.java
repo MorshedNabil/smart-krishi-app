@@ -1,8 +1,10 @@
 package com.nabil.smartkrishi;
 
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +23,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.nabil.smartkrishi.profile.ProfileActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +41,9 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
         // Required empty public constructor
     }
+
     RecyclerView recyclerView;
+    CardView profileCard;
     TextView tvDate;
     TextView tvSeeAll;
     ArrayList<NewsItem> newsListHome = new ArrayList<>();
@@ -54,6 +59,7 @@ public class HomeFragment extends Fragment {
         sunView = myView.findViewById(R.id.dotted_curve);
         tvDate = myView.findViewById(R.id.tvDate);
         tvSeeAll = myView.findViewById(R.id.tvSeeAll);
+        profileCard = myView.findViewById(R.id.profilePicCard);
 
         setCurrentDate();
 
@@ -62,6 +68,16 @@ public class HomeFragment extends Fragment {
         recyclerView.setAdapter(myAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        // ========================= Profile Card ===========================
+        profileCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Handle the click event here
+                Intent intent = new Intent(requireContext(), ProfileActivity.class);
+                startActivity(intent);
+                //Toast.makeText(getActivity(), "Profile Card Clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
         // ========================= Sun UI ===========================
@@ -126,7 +142,7 @@ public class HomeFragment extends Fragment {
                 // Optionally, show a toast message to the user
                 Toast.makeText(getActivity(), "Failed to load news", Toast.LENGTH_SHORT).show();
             }
-        }){
+        }) {
 
             // *** THIS IS THE FIX FOR THE 403 FORBIDDEN ERROR ***
             @Override

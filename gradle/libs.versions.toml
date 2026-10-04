@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.0"
+agp = "8.9.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -7,9 +7,12 @@ appcompat = "1.7.1"
 material = "1.13.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
-googleGmsGoogleServices = "4.4.4"
+googleGmsGoogleServices = "4.5.0"
 firebaseAuth = "24.0.1"
 pinview = "1.4.4"
+kotlin = "2.4.0"
+coreKtx = "1.15.0"
+activityKtx = "1.13.0" # version changed
 
 [libraries]
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
@@ -24,8 +27,13 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 pinview = { module = "com.chaos.view:pinview", version.ref = "pinview" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
+# new added lines
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
