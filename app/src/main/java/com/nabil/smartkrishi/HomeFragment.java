@@ -1,6 +1,7 @@
 package com.nabil.smartkrishi;
 
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.cardview.widget.CardView;
@@ -22,6 +23,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.nabil.smartkrishi.profile.ProfileActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,12 +73,14 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Handle the click event here
-                Toast.makeText(getActivity(), "Profile Card Clicked", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(requireContext(), ProfileActivity.class);
+                startActivity(intent);
+                //Toast.makeText(getActivity(), "Profile Card Clicked", Toast.LENGTH_SHORT).show();
             }
         });
 
 
-                // ========================= Sun UI ===========================
+        // ========================= Sun UI ===========================
         float progress = updateSunUI("06:30", "18:30");
         animateSun(progress);
 

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -453,6 +454,7 @@ fun ProfileContent(
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundCream)
+            .safeDrawingPadding() // Automatically adds top padding for Status Bar & bottom padding for Navigation Bar
     ) {
         Column(
             modifier = Modifier
