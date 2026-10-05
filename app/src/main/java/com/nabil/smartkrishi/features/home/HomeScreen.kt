@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,10 +12,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
@@ -35,10 +39,15 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -57,8 +66,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nabil.smartkrishi.R
+import com.nabil.smartkrishi.ui.theme.BackgroundCream
 import com.nabil.smartkrishi.ui.theme.DarkGreenText
 import com.nabil.smartkrishi.ui.theme.KantumruyPro
+import com.nabil.smartkrishi.ui.theme.SimpleWhite
+import com.nabil.smartkrishi.ui.theme.SmallCircleColor
 import com.nabil.smartkrishi.ui.theme.SmartKrishiTheme
 import com.nabil.smartkrishi.ui.theme.TextSecondary
 import kotlinx.coroutines.delay
@@ -72,9 +84,21 @@ val bestInvestmentItems = listOf(
 )
 
 val newsItems = listOf(
-    NewsItem(image = R.drawable.agri_news_1, title = R.string.agri_news_1, date = R.string.agri_news_date),
-    NewsItem(image = R.drawable.agri_news_2, title = R.string.agri_news_2, date = R.string.agri_news_date),
-    NewsItem(image = R.drawable.agri_news_3, title = R.string.agri_news_3, date = R.string.agri_news_date)
+    NewsItem(
+        image = R.drawable.agri_news_1,
+        title = R.string.agri_news_1,
+        date = R.string.agri_news_date
+    ),
+    NewsItem(
+        image = R.drawable.agri_news_2,
+        title = R.string.agri_news_2,
+        date = R.string.agri_news_date
+    ),
+    NewsItem(
+        image = R.drawable.agri_news_3,
+        title = R.string.agri_news_3,
+        date = R.string.agri_news_date
+    )
 )
 //
 //val navigationItems = listOf(
@@ -89,6 +113,7 @@ fun HeaderSection(
     @DrawableRes drawable: Int,
     @StringRes text: Int,
     modifier: Modifier = Modifier,
+    onProfileClick: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -117,14 +142,22 @@ fun HeaderSection(
             )
         }
 
-        Image(
-            painter = painterResource(drawable),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
+        Box(
             modifier = Modifier
-                .size(44.dp)
-                .clip(CircleShape)
-        )
+                .clip(CircleShape) // Clip first so the ripple effect stays circular, then add .clickable
+                .clickable {
+                    onProfileClick()
+                }
+        ) {
+            Image(
+                painter = painterResource(drawable),
+                contentDescription = "Profile Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape),
+            )
+        }
     }
 }
 
@@ -140,7 +173,7 @@ fun WeatherCard(
         modifier = modifier
             .fillMaxWidth()
             .height(313.dp),
-        color = Color(0xFFFFFFFF),
+        color = SimpleWhite,
         shape = MaterialTheme.shapes.large
     ) {
         Column(
@@ -159,7 +192,7 @@ fun WeatherCard(
                     Box(
                         modifier = Modifier
                             .size(30.dp)
-                            .background(color = Color(0xFFF0F7F2), shape = CircleShape),
+                            .background(color = SmallCircleColor, shape = CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -227,7 +260,7 @@ fun WeatherCard(
                         modifier = Modifier.padding(top = 10.dp),
                         text = "Humidity $humidity%",
                         style = TextStyle(
-                            color = DarkGreenText ,
+                            color = DarkGreenText,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Normal,
                             fontFamily = KantumruyPro
@@ -247,7 +280,7 @@ fun WeatherCard(
                             append("Sun Rise:  ")
                             withStyle(
                                 style = SpanStyle(
-                                    color = Color(0xFF111827) ,
+                                    color = Color(0xFF111827),
                                     fontSize = 11.sp,
                                     fontFamily = KantumruyPro,
                                     fontWeight = FontWeight.Bold
@@ -276,7 +309,7 @@ fun WeatherCard(
                             append("Sun Set:  ")
                             withStyle(
                                 style = SpanStyle(
-                                    color = Color(0xFF111827) ,
+                                    color = Color(0xFF111827),
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     fontFamily = KantumruyPro
@@ -353,9 +386,9 @@ fun BestInvestmentItem(
             .width(86.dp)
             .height(99.dp),
         shape = MaterialTheme.shapes.large,
-        color = colorResource(id = R.color.white),
-        tonalElevation = 4.dp, // Added elevation to make the card visible
-        shadowElevation = 2.dp
+        color = SimpleWhite,
+        tonalElevation = 0.dp, // 0.dp prevents Material 3 green primary tinting on plain white
+        shadowElevation = 4.dp
     ) {
         Column(
             modifier = Modifier
@@ -367,7 +400,10 @@ fun BestInvestmentItem(
             Box(
                 modifier = Modifier
                     .size(30.dp)
-                    .background(color = Color(0xFFF8F8F8), shape = CircleShape),
+                    .background(
+                        color = SmallCircleColor,
+                        shape = CircleShape
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -479,8 +515,6 @@ fun AgriNewsItem(
                 }
             }
         }
-
-
     }
 }
 
@@ -495,7 +529,8 @@ fun AutoScrollingNewsList(
         while (true) { // infinite loop to circulate the news cards for infinite time by giving a delay of 3 milisec
             yield()
             delay(5000) // 5 seconds delay
-            val nextPage = (pagerState.currentPage + 1) % newsItems.size // iterate to the last index then come again to the 0th index to circulate the cards for infinite time
+            val nextPage =
+                (pagerState.currentPage + 1) % newsItems.size // iterate to the last index then come again to the 0th index to circulate the cards for infinite time
             pagerState.animateScrollToPage(nextPage)
         }
     }
@@ -513,7 +548,7 @@ fun AutoScrollingNewsList(
 }
 
 @Composable
-fun HomeSection(
+fun CommonHomeSection(
     @StringRes title: Int,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
@@ -525,7 +560,7 @@ fun HomeSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(end = 24.dp , bottom = 14.dp),
+                .padding(end = 24.dp, bottom = 14.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -556,7 +591,8 @@ fun HomeSection(
 // Full Home Screen
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onProfileClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -568,7 +604,8 @@ fun HomeScreen(
         HeaderSection(
             modifier = Modifier.padding(horizontal = 24.dp),
             drawable = R.drawable.farmer_dp,
-            text = R.string.user
+            text = R.string.user,
+            onProfileClick = onProfileClick // Forwards click event
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -583,7 +620,7 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        HomeSection(
+        CommonHomeSection(
             title = R.string.bestInvestmet
         ) {
             BestInvestmentRow()
@@ -591,36 +628,37 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        HomeSection(
+        CommonHomeSection(
             title = R.string.agriNews
         ) {
             AutoScrollingNewsList()
         }
 
         // Just for testing the vertical scroll
-        Spacer(modifier = Modifier.height(24.dp))
-
-        HomeSection(
-            title = R.string.bestInvestmet
-        ) {
-            BestInvestmentRow()
-        }
+//        Spacer(modifier = Modifier.height(24.dp))
+//
+//        HomeSection(
+//            title = R.string.bestInvestmet
+//        ) {
+//            BestInvestmentRow()
+//        }
     }
 }
 
 // ======================= Preview =======================
-//@Preview(showBackground = true)
-//@Composable
-//fun HeaderSectionPreview() {
-//    SmartKrishiTheme {
-//        HeaderSection(
-//            drawable = R.drawable.farmer_dp,
-//            text = R.string.user,
-//            modifier = Modifier
-//                .padding(horizontal = 8.dp)
-//        )
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun HeaderSectionPreview() {
+    SmartKrishiTheme {
+        HeaderSection(
+            drawable = R.drawable.farmer_dp,
+            text = R.string.user,
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+        )
+    }
+}
+
 //
 //@Preview(showBackground = true)
 //@Composable
@@ -635,24 +673,24 @@ fun HomeScreen(
 //    }
 //}
 //
-//@Preview(showBackground = true)
-//@Composable
-//fun BestInvestmentItemPreview() {
-//    SmartKrishiTheme {
-//        BestInvestmentItem(
-//            item = bestInvestmentItems[0]
-//        )
-//    }
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun BestInvestmentRowPreview() {
-//    SmartKrishiTheme {
-//        BestInvestmentRow()
-//    }
-//}
-//
+@Preview(showBackground = true)
+@Composable
+fun BestInvestmentItemPreview() {
+    SmartKrishiTheme {
+        BestInvestmentItem(
+            item = bestInvestmentItems[0]
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BestInvestmentRowPreview() {
+    SmartKrishiTheme {
+        BestInvestmentRow()
+    }
+}
+
 //@Preview(showBackground = true, backgroundColor = 0XFF000000)
 //@Composable
 //fun AgriNewsItemPreview() {
