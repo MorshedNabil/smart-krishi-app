@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">Smart Krishi</string>
+
     <!-- Login Screen Strings -->
     <string name="login">Log in</string>
     <string name="login_prompt_signup"><u>Don\'t have an account?</u></string>
@@ -10,4 +11,28 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="see_all"><u>See All</u></string>
     <string name="resend_otp"><u>Resend OTP</u></string>
+
+    <!-- Username -->
+    <string name="user">Nabil Morshed</string>
+
+    <!-- Best Investment Card strings -->
+    <string name="CT_Duration">Duration</string>
+    <string name="CT_Return">Return</string>
+    <string name="CT_LowRisk">Low Risk</string>
+    <string name="CT_Safety">Safety</string>
+
+    <!-- News Strings -->
+    <string name="agri_news_1">Rangpur rice farmers reaping benefits of natural pest control methods</string>
+    <string name="agri_news_date">12 Jan, 2026</string>
+    <string name="agri_news_2">Youth achieves success cultivating off-season yellow watermelon in Birganj</string>
+    <string name="agri_news_3">Bangladesh witnesses revolution in fish farming amid fall in natural production</string>
+
+    <!-- Section titles  -->
+    <string name="bestInvestmet">Best Investment for You</string>
+    <string name="agriNews">Top Agriculture News</string>
+
+    <!-- Bottom Nav items titles  -->
+    <string name="bottom_navigation_home">Home</string>
+    <string name="bottom_navigation_profile">My Products</string>
+    <string name="bottom_navigation_notification">Notification</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.nabil.smartkrishi.profile
+package com.nabil.smartkrishi.features.profile
 
 import android.os.Bundle
 import android.widget.Toast

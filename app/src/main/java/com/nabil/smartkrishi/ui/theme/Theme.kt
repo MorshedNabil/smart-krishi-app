@@ -1,7 +1,9 @@
 package com.nabil.smartkrishi.ui.theme
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 private val LightColors = lightColorScheme(
     primary = GreenPrimary,
@@ -16,7 +18,11 @@ fun SmartKrishiTheme(
 ) {
     MaterialTheme(
         colorScheme = LightColors,
-        typography = AppTypography,
-        content = content
-    )
+        typography = Typography
+    ) {
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            content = content
+        )
+    }
 }
