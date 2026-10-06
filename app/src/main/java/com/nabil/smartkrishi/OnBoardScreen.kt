@@ -20,10 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -32,33 +29,47 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.nabil.smartkrishi.features.home.HomeScreen
 import com.nabil.smartkrishi.ui.theme.BackgroundCream
 import com.nabil.smartkrishi.ui.theme.KantumruyPro
-import com.nabil.smartkrishi.ui.theme.SimpleWhite
 import com.nabil.smartkrishi.ui.theme.SmartKrishiTheme
 
-// Data class for Bottom Navigation Items
-data class BottomNavItem(
+// Sealed class representing standard Navigation Destinations
+sealed class Screen(
+    val route: String,
     val title: String,
     @DrawableRes val icon: Int,
     val badgeCount: Int = 0
+) {
+    object Home : Screen(route = "home", title = "Home", icon = R.drawable.home)
+    object BankLoan : Screen(route = "bank_loan", title = "Bank Loan", icon = R.drawable.bank)
+    object MyProducts : Screen(route = "my_products", title = "My Products", icon = R.drawable.product)
+    object Notifications : Screen(route = "notifications", title = "Notifications", icon = R.drawable.bell, badgeCount = 12)
+}
+
+val bottomNavScreens = listOf(
+    Screen.Home,
+    Screen.BankLoan,
+    Screen.MyProducts,
+    Screen.Notifications
 )
 
-val bottomNavItems = listOf(
-    BottomNavItem(title = "Home", icon = R.drawable.home),
-    BottomNavItem(title = "Bank Loan", icon = R.drawable.bank),
-    BottomNavItem(title = "My Products", icon = R.drawable.product),
-    BottomNavItem(title = "Notifications", icon = R.drawable.bell, badgeCount = 12)
-)
-
-// Standalone Custom Bottom Navigation Bar matching XML design
+// Standalone Custom Bottom Navigation Bar matching XML design and Compose Navigation standards
 @Composable
 fun BottomNavBar(
-    selectedIndex: Int,
-    onItemSelected: (Int) -> Unit,
+    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = BackgroundCream,
@@ -70,23 +81,33 @@ fun BottomNavBar(
             contentColor = Color(0xFF2D6A4F),
             tonalElevation = 0.dp
         ) {
-            bottomNavItems.forEachIndexed { index, item ->
-                val isSelected = selectedIndex == index
+            bottomNavScreens.forEach { screen ->
+                val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                 val itemColor = if (isSelected) Color(0xFF2D6A4F) else Color(0xFF444444)
 
                 NavigationBarItem(
                     selected = isSelected,
-                    onClick = { onItemSelected(index) },
+                    onClick = {
+                        if (currentDestination?.route != screen.route) {
+                            navController.navigate(screen.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    },
                     icon = {
                         BadgedBox(
                             badge = {
-                                if (item.badgeCount > 0) {
+                                if (screen.badgeCount > 0) {
                                     Badge(
                                         containerColor = Color(0xFFE53935),
                                         contentColor = Color.White
                                     ) {
                                         Text(
-                                            text = "${item.badgeCount}",
+                                            text = "${screen.badgeCount}",
                                             style = TextStyle(
                                                 fontSize = 10.sp,
                                                 fontWeight = FontWeight.Bold
@@ -97,8 +118,8 @@ fun BottomNavBar(
                             }
                         ) {
                             Icon(
-                                painter = painterResource(id = item.icon),
-                                contentDescription = item.title,
+                                painter = painterResource(id = screen.icon),
+                                contentDescription = screen.title,
                                 tint = itemColor,
                                 modifier = Modifier.size(24.dp)
                             )
@@ -106,7 +127,7 @@ fun BottomNavBar(
                     },
                     label = {
                         Text(
-                            text = item.title,
+                            text = screen.title,
                             style = TextStyle(
                                 fontSize = 11.sp,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
@@ -128,42 +149,58 @@ fun BottomNavBar(
     }
 }
 
-// Full OnBoard Screen Composable containing the layout & Navigation Bar
+// Full OnBoard Screen Composable acting as the NavHost container
 @Composable
 fun OnBoardScreen(
+    navController: NavHostController = rememberNavController(),
     onProfileClick: () -> Unit = {}
 ) {
-    var selectedIndex by remember { mutableIntStateOf(0) }
-
     Scaffold(
         bottomBar = {
-            BottomNavBar(
-                selectedIndex = selectedIndex,
-                onItemSelected = {
-                    selectedIndex = it
-                }
-            )
+            BottomNavBar(navController = navController)
         },
         contentWindowInsets = WindowInsets.safeDrawing
     ) { paddingValues ->
-        Box(
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Home.route,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()) // only pass the top padding to the outer box that contains different screens
+                .padding(top = paddingValues.calculateTopPadding())
         ) {
-            when (selectedIndex) {
-                0 -> HomeScreen(
-                    bottomPadding = paddingValues.calculateBottomPadding(), // only pass the bottom padding to home screen
+            composable(Screen.Home.route) {
+                HomeScreen(
+                    bottomPadding = paddingValues.calculateBottomPadding(),
                     onProfileClick = onProfileClick
                 )
-                1 -> { /* Bank Loan Screen */ }
-                2 -> { /* My Products Screen */ }
-                3 -> { /* Notifications Screen */ }
+            }
+            composable(Screen.BankLoan.route) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Bank Loan Screen")
+                }
+            }
+            composable(Screen.MyProducts.route) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("My Products Screen")
+                }
+            }
+            composable(Screen.Notifications.route) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Notifications Screen")
+                }
             }
         }
     }
 }
-
 
 // =============== Previews ====================
 @Preview(showBackground = true, showSystemUi = true)
