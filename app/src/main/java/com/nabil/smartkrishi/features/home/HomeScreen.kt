@@ -63,6 +63,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nabil.smartkrishi.R
@@ -592,10 +593,12 @@ fun CommonHomeSection(
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    bottomPadding: Dp = 0.dp,
     onProfileClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
+            .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
         // Top Space
@@ -633,15 +636,8 @@ fun HomeScreen(
         ) {
             AutoScrollingNewsList()
         }
-
-        // Just for testing the vertical scroll
-//        Spacer(modifier = Modifier.height(24.dp))
-//
-//        HomeSection(
-//            title = R.string.bestInvestmet
-//        ) {
-//            BestInvestmentRow()
-//        }
+        // safe padding to move the contents above the bottom navigation bar
+        Spacer(modifier = Modifier.height(bottomPadding + 16.dp))
     }
 }
 

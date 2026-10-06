@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
@@ -60,11 +61,12 @@ fun BottomNavBar(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = SimpleWhite,
+        color = BackgroundCream,
+        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
         shadowElevation = 16.dp
     ) {
         NavigationBar(
-            containerColor = SimpleWhite,
+            containerColor = Color.Transparent,
             contentColor = Color(0xFF2D6A4F),
             tonalElevation = 0.dp
         ) {
@@ -134,11 +136,12 @@ fun OnBoardScreen(
     var selectedIndex by remember { mutableIntStateOf(0) }
 
     Scaffold(
-        containerColor = BackgroundCream,
         bottomBar = {
             BottomNavBar(
                 selectedIndex = selectedIndex,
-                onItemSelected = { selectedIndex = it }
+                onItemSelected = {
+                    selectedIndex = it
+                }
             )
         },
         contentWindowInsets = WindowInsets.safeDrawing
@@ -146,10 +149,13 @@ fun OnBoardScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(top = paddingValues.calculateTopPadding()) // only pass the top padding to the outer box that contains different screens
         ) {
             when (selectedIndex) {
-                0 -> HomeScreen(onProfileClick = onProfileClick)
+                0 -> HomeScreen(
+                    bottomPadding = paddingValues.calculateBottomPadding(), // only pass the bottom padding to home screen
+                    onProfileClick = onProfileClick
+                )
                 1 -> { /* Bank Loan Screen */ }
                 2 -> { /* My Products Screen */ }
                 3 -> { /* Notifications Screen */ }
@@ -158,7 +164,9 @@ fun OnBoardScreen(
     }
 }
 
-@Preview(showBackground = true)
+
+// =============== Previews ====================
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun OnBoardScreenPreview() {
     SmartKrishiTheme {
