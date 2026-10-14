@@ -53,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -63,6 +64,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nabil.smartkrishi.R
@@ -76,6 +78,8 @@ import com.nabil.smartkrishi.ui.theme.TextSecondary
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
 
+
+// ===================== Constants =====================
 val bestInvestmentItems = listOf(
     BestInvestmentItems(icon = Icons.Default.Timer, title = R.string.CT_Duration),
     BestInvestmentItems(icon = Icons.Default.ArrowOutward, title = R.string.CT_Return),
@@ -84,23 +88,18 @@ val bestInvestmentItems = listOf(
 )
 
 val newsItems = listOf(
-    NewsItem(
-        image = R.drawable.agri_news_1,
-        title = R.string.agri_news_1,
-        date = R.string.agri_news_date
-    ),
-    NewsItem(
-        image = R.drawable.agri_news_2,
-        title = R.string.agri_news_2,
-        date = R.string.agri_news_date
-    ),
-    NewsItem(
-        image = R.drawable.agri_news_3,
-        title = R.string.agri_news_3,
-        date = R.string.agri_news_date
-    )
+    NewsItem(image = R.drawable.agri_news_1, title = R.string.agri_news_1, date = R.string.agri_news_date),
+    NewsItem(image = R.drawable.agri_news_2, title = R.string.agri_news_2, date = R.string.agri_news_date),
+    NewsItem(image = R.drawable.agri_news_3, title = R.string.agri_news_3, date = R.string.agri_news_date)
 )
-//
+
+val farmerTools = listOf(
+    FarmerTool(icon = Icons.Default.Timer, title = "Sowing Calendar"),
+    FarmerTool(icon = Icons.Default.ArrowOutward, title = "Fertilizer Guide"),
+    FarmerTool(icon = Icons.Default.SafetyCheck, title = "Irrigation Plan"),
+    FarmerTool(icon = Icons.Default.EnergySavingsLeaf, title = "Pest Control")
+)
+
 //val navigationItems = listOf(
 //    CategoryItem(icon = Icons.Default.Home, title = R.string.bottom_navigation_home),
 //    CategoryItem(icon = Icons.Default.Inbox, title = R.string.bottom_navigation_profile),
@@ -142,6 +141,7 @@ fun HeaderSection(
             )
         }
 
+        // profile avatar
         Box(
             modifier = Modifier
                 .clip(CircleShape) // Clip first so the ripple effect stays circular, then add .clickable
@@ -588,14 +588,250 @@ fun CommonHomeSection(
     }
 }
 
+@Composable
+fun MarketPricesSection(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Market Prices",
+                style = TextStyle(
+                    color = colorResource(id = R.color.black),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = KantumruyPro
+                )
+            )
+
+            Text(
+                text = "view all",
+                style = TextStyle(
+                    color = DarkGreenText,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Normal,
+                    fontFamily = KantumruyPro
+                )
+            )
+        }
+
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = SimpleWhite,
+            shape = MaterialTheme.shapes.large,
+            shadowElevation = 2.dp
+        ) {
+            Row(
+                modifier = Modifier.padding(14.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Image Box / Placeholder
+                Box(
+                    modifier = Modifier
+                        .size(width = 96.dp, height = 80.dp)
+                        .background(color = Color(0xFFF0F7F2), shape = RoundedCornerShape(16.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(width = 56.dp, height = 36.dp)
+                            .background(color = Color(0xFFD1D5DB), shape = RoundedCornerShape(8.dp))
+                    )
+                }
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Rice & Wheat Prices",
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = KantumruyPro,
+                                color = Color(0xFF111827)
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = Color(0xFFE2EFE7),
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = "Today",
+                                style = TextStyle(
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = KantumruyPro,
+                                    color = DarkGreenText
+                                )
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = "Latest wholesale prices from nearby markets for rice, wheat, and vegetables.",
+                        style = TextStyle(
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Normal,
+                            fontFamily = KantumruyPro,
+                            color = TextSecondary
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FarmerToolCard(
+    modifier: Modifier = Modifier,
+    tool: FarmerTool
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(90.dp),
+        shape = MaterialTheme.shapes.large,
+        color = SimpleWhite,
+        shadowElevation = 2.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(30.dp)
+                    .background(
+                        color = SmallCircleColor,
+                        shape = CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = tool.icon,
+                    modifier = Modifier.size(20.dp),
+                    contentDescription = null,
+                    tint = DarkGreenText
+                )
+            }
+
+            Text(
+                text = tool.title,
+                style = TextStyle(
+                    color = Color(0xFF111827),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = KantumruyPro
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun FarmerToolsSection(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Farmer Tools",
+                style = TextStyle(
+                    color = colorResource(id = R.color.black),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = KantumruyPro
+                )
+            )
+
+            Text(
+                text = "view all",
+                style = TextStyle(
+                    color = DarkGreenText,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Normal,
+                    fontFamily = KantumruyPro
+                )
+            )
+        }
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                FarmerToolCard(
+                    modifier = Modifier.weight(1f),
+                    tool = farmerTools[0]
+                )
+                FarmerToolCard(
+                    modifier = Modifier.weight(1f),
+                    tool = farmerTools[1]
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                FarmerToolCard(
+                    modifier = Modifier.weight(1f),
+                    tool = farmerTools[2]
+                )
+                FarmerToolCard(
+                    modifier = Modifier.weight(1f),
+                    tool = farmerTools[3]
+                )
+            }
+        }
+    }
+}
+
 // Full Home Screen
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    bottomPadding: Dp = 0.dp,
     onProfileClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
+            .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
         // Top Space
@@ -628,36 +864,37 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        MarketPricesSection()
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        FarmerToolsSection()
+
+        Spacer(modifier = Modifier.height(24.dp))
+
         CommonHomeSection(
             title = R.string.agriNews
         ) {
             AutoScrollingNewsList()
         }
-
-        // Just for testing the vertical scroll
-//        Spacer(modifier = Modifier.height(24.dp))
-//
-//        HomeSection(
-//            title = R.string.bestInvestmet
-//        ) {
-//            BestInvestmentRow()
-//        }
+        // safe padding to move the contents above the bottom navigation bar
+        Spacer(modifier = Modifier.height(bottomPadding + 16.dp))
     }
 }
 
 // ======================= Preview =======================
-@Preview(showBackground = true)
-@Composable
-fun HeaderSectionPreview() {
-    SmartKrishiTheme {
-        HeaderSection(
-            drawable = R.drawable.farmer_dp,
-            text = R.string.user,
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun HeaderSectionPreview() {
+//    SmartKrishiTheme {
+//        HeaderSection(
+//            drawable = R.drawable.farmer_dp,
+//            text = R.string.user,
+//            modifier = Modifier
+//                .padding(horizontal = 8.dp)
+//        )
+//    }
+//}
 
 //
 //@Preview(showBackground = true)
@@ -673,23 +910,23 @@ fun HeaderSectionPreview() {
 //    }
 //}
 //
-@Preview(showBackground = true)
-@Composable
-fun BestInvestmentItemPreview() {
-    SmartKrishiTheme {
-        BestInvestmentItem(
-            item = bestInvestmentItems[0]
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BestInvestmentRowPreview() {
-    SmartKrishiTheme {
-        BestInvestmentRow()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun BestInvestmentItemPreview() {
+//    SmartKrishiTheme {
+//        BestInvestmentItem(
+//            item = bestInvestmentItems[0]
+//        )
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun BestInvestmentRowPreview() {
+//    SmartKrishiTheme {
+//        BestInvestmentRow()
+//    }
+//}
 
 //@Preview(showBackground = true, backgroundColor = 0XFF000000)
 //@Composable
