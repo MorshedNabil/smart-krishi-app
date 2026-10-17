@@ -605,7 +605,10 @@ val defaultNullMarketPrice = MarketPriceDto(
     source = null,
     marketName = null,
     marketLocation = null,
-    createdAt = null
+    createdAt = null,
+    updatedAt = null,
+    observedAt = null,
+    currency = null
 ).toMarketPriceDO()
 
 @Composable
