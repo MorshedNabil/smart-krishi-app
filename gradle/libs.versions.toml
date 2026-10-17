@@ -13,6 +13,7 @@ pinview = "1.4.4"
 kotlin = "2.4.0"
 coreKtx = "1.15.0"
 activityKtx = "1.13.0" # version changed
+kotlinSerialization = "2.1.0"
 
 [libraries]
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
@@ -36,4 +37,4 @@ google-gms-google-services = { id = "com.google.gms.google-services", version.re
 # new added lines
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization" }

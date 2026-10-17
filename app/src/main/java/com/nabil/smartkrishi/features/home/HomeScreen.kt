@@ -1,5 +1,7 @@
 package com.nabil.smartkrishi.features.home
 
+import android.util.Log
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -55,6 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -67,7 +70,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nabil.smartkrishi.R
+import com.nabil.smartkrishi.data.remote.dto.MarketPriceDto
+import com.nabil.smartkrishi.data.repository.toMarketPriceDO
+import com.nabil.smartkrishi.domain.model.MarketPrice
 import com.nabil.smartkrishi.ui.theme.BackgroundCream
 import com.nabil.smartkrishi.ui.theme.DarkGreenText
 import com.nabil.smartkrishi.ui.theme.KantumruyPro
@@ -588,9 +596,132 @@ fun CommonHomeSection(
     }
 }
 
+// Generates the fallback MarketPrice object directly through your toMarketPriceDO() function
+val defaultNullMarketPrice = MarketPriceDto(
+    id = null,
+    cropTitle = null,
+    pricePerKg = null,
+    unit = null,
+    source = null,
+    marketName = null,
+    marketLocation = null,
+    createdAt = null
+).toMarketPriceDO()
+
+@Composable
+fun MarketPriceCard(
+    modifier: Modifier = Modifier,
+    marketPrice: MarketPrice = defaultNullMarketPrice
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = SimpleWhite,
+        shape = MaterialTheme.shapes.large,
+        shadowElevation = 2.dp
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Image Box / Placeholder
+            Box(
+                modifier = Modifier
+                    .size(width = 96.dp, height = 84.dp)
+                    .background(color = Color(0xFFF0F7F2), shape = RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(width = 56.dp, height = 36.dp)
+                        .background(color = Color(0xFFD1D5DB), shape = RoundedCornerShape(8.dp))
+                )
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                // Header: Crop Title + Date Badge
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = marketPrice.cropTitle,
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = KantumruyPro,
+                            color = Color(0xFF111827)
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = Color(0xFFE2EFE7),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    ) {
+                        Text(
+                            text = marketPrice.createdAt,
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Medium,
+                                fontFamily = KantumruyPro,
+                                color = DarkGreenText
+                            )
+                        )
+                    }
+                }
+
+                // Price
+                Text(
+                    text = marketPrice.formattedPrice,
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = KantumruyPro,
+                        color = DarkGreenText
+                    )
+                )
+
+                // Market Name & Location Info Row
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = null,
+                        tint = DarkGreenText,
+                        modifier = Modifier.size(14.dp)
+                    )
+
+                    Text(
+                        text = "${marketPrice.marketName} • ${marketPrice.marketLocation}",
+                        style = TextStyle(
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Normal,
+                            fontFamily = KantumruyPro,
+                            color = TextSecondary
+                        ),
+                        maxLines = 1
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun MarketPricesSection(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    marketPrice: MarketPrice = defaultNullMarketPrice
 ) {
     Column(
         modifier = modifier
@@ -625,83 +756,7 @@ fun MarketPricesSection(
             )
         }
 
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = SimpleWhite,
-            shape = MaterialTheme.shapes.large,
-            shadowElevation = 2.dp
-        ) {
-            Row(
-                modifier = Modifier.padding(14.dp),
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Image Box / Placeholder
-                Box(
-                    modifier = Modifier
-                        .size(width = 96.dp, height = 80.dp)
-                        .background(color = Color(0xFFF0F7F2), shape = RoundedCornerShape(16.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(width = 56.dp, height = 36.dp)
-                            .background(color = Color(0xFFD1D5DB), shape = RoundedCornerShape(8.dp))
-                    )
-                }
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Rice & Wheat Prices",
-                            style = TextStyle(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = KantumruyPro,
-                                color = Color(0xFF111827)
-                            ),
-                            modifier = Modifier.weight(1f)
-                        )
-
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    color = Color(0xFFE2EFE7),
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .padding(horizontal = 8.dp, vertical = 3.dp)
-                        ) {
-                            Text(
-                                text = "Today",
-                                style = TextStyle(
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    fontFamily = KantumruyPro,
-                                    color = DarkGreenText
-                                )
-                            )
-                        }
-                    }
-
-                    Text(
-                        text = "Latest wholesale prices from nearby markets for rice, wheat, and vegetables.",
-                        style = TextStyle(
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Normal,
-                            fontFamily = KantumruyPro,
-                            color = TextSecondary
-                        )
-                    )
-                }
-            }
-        }
+        MarketPriceCard(marketPrice = marketPrice)
     }
 }
 
@@ -827,8 +882,30 @@ fun FarmerToolsSection(
 fun HomeScreen(
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
-    onProfileClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {},
+    viewModel: HomeViewModel = viewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    // Show a Toast when facing an error. This block triggers when the uiState changes.
+    LaunchedEffect(uiState) {
+        val state = uiState
+        if (state is HomeUiState.Error) {
+            val errorMessage = state.message
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            Log.d("HomeScreen", "error message: $errorMessage")
+        }
+
+    }
+
+    // Determine market price data from state
+    val marketPrice = when (val state = uiState) {
+        is HomeUiState.Success -> state.marketPrice // in case of success, use the data get from API
+        else -> defaultNullMarketPrice // in case of error, fall back to defaultNullMarketPrice
+    }
+    Log.d("HomeScreen", "marketPrice: $marketPrice")
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -864,7 +941,7 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        MarketPricesSection()
+        MarketPricesSection(marketPrice = marketPrice)
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -937,6 +1014,22 @@ fun HomeScreen(
 //        )
 //    }
 //}
+
+@Preview(showBackground = true)
+@Composable
+fun MarketPriceCardPreview() {
+    SmartKrishiTheme {
+        MarketPriceCard(marketPrice = defaultNullMarketPrice)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MarketPricesSectionPreview() {
+    SmartKrishiTheme {
+        MarketPricesSection(marketPrice = defaultNullMarketPrice)
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
