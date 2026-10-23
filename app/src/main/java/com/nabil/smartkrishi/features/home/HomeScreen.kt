@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.SafetyCheck
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -65,6 +66,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -107,12 +109,6 @@ val farmerTools = listOf(
     FarmerTool(icon = Icons.Default.SafetyCheck, title = "Irrigation Plan"),
     FarmerTool(icon = Icons.Default.EnergySavingsLeaf, title = "Pest Control")
 )
-
-//val navigationItems = listOf(
-//    CategoryItem(icon = Icons.Default.Home, title = R.string.bottom_navigation_home),
-//    CategoryItem(icon = Icons.Default.Inbox, title = R.string.bottom_navigation_profile),
-//    CategoryItem(icon = Icons.Default.Notifications, title = R.string.bottom_navigation_notification),
-//)
 
 // ===================== Composables =====================
 @Composable
@@ -880,7 +876,11 @@ fun FarmerToolsSection(
     }
 }
 
-// Full Home Screen
+// ================= Full Home Screen =============
+
+/**
+ * Stateful HomeScreen composable that manages ViewModel state, side effects (Toasts), and data loading.
+ */
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -890,75 +890,201 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    var isErrorDismissed by remember(uiState) { mutableStateOf(false) }
 
     // Show a Toast when facing an error. This block triggers when the uiState changes.
-    LaunchedEffect(uiState) {
-        val state = uiState
-        if (state is HomeUiState.Error) {
-            val errorMessage = state.message
-            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
-            Log.d("HomeScreen", "error message: $errorMessage")
+//    LaunchedEffect(uiState) {
+//        val state = uiState
+//        if (state is HomeUiState.Error) {
+//            val errorMessage = state.message
+//            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+//        }
+//    }
+
+    HomeScreen(
+        modifier = modifier,
+        uiState = uiState,
+        isErrorDismissed = isErrorDismissed,
+        bottomPadding = bottomPadding,
+        onProfileClick = onProfileClick,
+        onRetry = {
+            isErrorDismissed = false
+            viewModel.loadHomeData()
+        },
+        onCancel = {
+            isErrorDismissed = true
         }
+    )
+}
 
-    }
-
+/**
+ * Stateless HomeScreen composable that renders the UI based purely on the given HomeUiState and callbacks.
+ */
+@Composable
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    uiState: HomeUiState,
+    isErrorDismissed: Boolean = false,
+    bottomPadding: Dp = 0.dp,
+    onProfileClick: () -> Unit = {},
+    onRetry: () -> Unit = {},
+    onCancel: () -> Unit = {}
+) {
     // Determine market price data from state
-    val marketPrice = when (val state = uiState) {
-        is HomeUiState.Success -> state.marketPrice // in case of success, use the data get from API
-        else -> defaultNullMarketPrice // in case of error, fall back to defaultNullMarketPrice
+    val marketPrice = when (uiState) {
+        is HomeUiState.Success -> uiState.marketPrice // in case of success, use the data get from API
+        else -> defaultNullMarketPrice // in case of error/loading, fall back to defaultNullMarketPrice
     }
-    Log.d("HomeScreen", "marketPrice: $marketPrice")
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
-        // Top Space
-        Spacer(modifier = Modifier.height(16.dp))
-
-        HeaderSection(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            drawable = R.drawable.farmer_dp,
-            text = R.string.user,
-            onProfileClick = onProfileClick // Forwards click event
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        WeatherCard(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            temperature = "25",
-            humidity = "17",
-            sunSetTime = "6:30",
-            sunRiseTime = "5:00"
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        CommonHomeSection(
-            title = R.string.bestInvestmet
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
-            BestInvestmentRow()
+            // Top Space
+            Spacer(modifier = Modifier.height(16.dp))
+
+            HeaderSection(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                drawable = R.drawable.farmer_dp,
+                text = R.string.user,
+                onProfileClick = onProfileClick // Forwards click event
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            WeatherCard(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                temperature = "25",
+                humidity = "17",
+                sunSetTime = "6:30",
+                sunRiseTime = "5:00"
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            CommonHomeSection(
+                title = R.string.bestInvestmet
+            ) {
+                BestInvestmentRow()
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            MarketPricesSection(marketPrice = marketPrice)
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            FarmerToolsSection()
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            CommonHomeSection(
+                title = R.string.agriNews
+            ) {
+                AutoScrollingNewsList()
+            }
+            // safe padding to move the contents above the bottom navigation bar
+            Spacer(modifier = Modifier.height(bottomPadding + 16.dp))
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        MarketPricesSection(marketPrice = marketPrice)
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        FarmerToolsSection()
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        CommonHomeSection(
-            title = R.string.agriNews
-        ) {
-            AutoScrollingNewsList()
+        // if data loading then show a loading indicator
+        if (uiState is HomeUiState.Loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                androidx.compose.material3.CircularProgressIndicator(
+                    color = DarkGreenText
+                )
+            }
         }
-        // safe padding to move the contents above the bottom navigation bar
-        Spacer(modifier = Modifier.height(bottomPadding + 16.dp))
+        // If data load fails show a error message box
+        if (uiState is HomeUiState.Error && !isErrorDismissed) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Surface(
+                    modifier = Modifier.padding(24.dp),
+                    shape = MaterialTheme.shapes.large,
+                    color = SimpleWhite,
+                    shadowElevation = 4.dp
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Error Loading Data",
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = KantumruyPro,
+                                color = Color.Red
+                            )
+                        )
+                        Text(
+                            text = uiState.message,
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontFamily = KantumruyPro,
+                                color = TextSecondary
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Button(
+                                onClick = onCancel,
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFFE5E7EB)
+                                ),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "Cancel",
+                                    style = TextStyle(
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        fontFamily = KantumruyPro,
+                                        color = Color(0xFF374151)
+                                    )
+                                )
+                            }
+
+                            Button(
+                                onClick = onRetry,
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                    containerColor = DarkGreenText
+                                ),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "Retry",
+                                    style = TextStyle(
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        fontFamily = KantumruyPro,
+                                        color = SimpleWhite
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1018,26 +1144,28 @@ fun HomeScreen(
 //    }
 //}
 
-@Preview(showBackground = true)
-@Composable
-fun MarketPriceCardPreview() {
-    SmartKrishiTheme {
-        MarketPriceCard(marketPrice = defaultNullMarketPrice)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MarketPricesSectionPreview() {
-    SmartKrishiTheme {
-        MarketPricesSection(marketPrice = defaultNullMarketPrice)
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun MarketPriceCardPreview() {
+//    SmartKrishiTheme {
+//        MarketPriceCard(marketPrice = defaultNullMarketPrice)
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun MarketPricesSectionPreview() {
+//    SmartKrishiTheme {
+//        MarketPricesSection(marketPrice = defaultNullMarketPrice)
+//    }
+//}
 
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
     SmartKrishiTheme {
-        HomeScreen()
+        HomeScreen(
+            uiState = HomeUiState.Success(marketPrice = defaultNullMarketPrice)
+        )
     }
 }
