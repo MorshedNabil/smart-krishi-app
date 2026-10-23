@@ -8,3 +8,8 @@ sealed interface HomeUiState {
     data class Success(val marketPrice: MarketPrice) : HomeUiState
     data class Error(val message: String) : HomeUiState
 }
+
+// UI State for Date in Header Section
+data class DateUiState(
+    val date: String = ""
+)

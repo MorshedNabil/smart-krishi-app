@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /**
  * HomeViewModel handles state logic for Home Screen and triggers Retrofit API calls via HomeRepository.
@@ -14,6 +17,9 @@ import kotlinx.coroutines.launch
 class HomeViewModel(
     private val repository: HomeRepository = HomeRepository()
 ) : ViewModel() {
+
+    private val _dateState = MutableStateFlow(DateUiState(date = getCurrentFormattedDate()))
+    val dateState: StateFlow<DateUiState> = _dateState.asStateFlow()
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -32,5 +38,13 @@ class HomeViewModel(
                 _uiState.value = HomeUiState.Error(exception.message ?: "Failed to load market prices")
             }
         }
+    }
+}
+
+private fun getCurrentFormattedDate(): String {
+    return try {
+        LocalDate.now().format(DateTimeFormatter.ofPattern("d MMMM, yyyy", Locale.ENGLISH))
+    } catch (e: Exception) {
+        "Date load failed"
     }
 }

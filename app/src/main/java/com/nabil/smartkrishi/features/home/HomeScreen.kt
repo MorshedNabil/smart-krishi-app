@@ -115,6 +115,7 @@ val farmerTools = listOf(
 fun HeaderSection(
     @DrawableRes drawable: Int,
     @StringRes text: Int,
+    date: String,
     modifier: Modifier = Modifier,
     onProfileClick: () -> Unit = {}
 ) {
@@ -138,7 +139,7 @@ fun HeaderSection(
                 color = DarkGreenText
             )
             Text(
-                text = "12 January, 2025",
+                text = date,
                 style = MaterialTheme.typography.labelMedium,
                 color = Color(0xFF6B7280),
                 modifier = Modifier.alpha(0.7f)
@@ -889,21 +890,13 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+    val dateState by viewModel.dateState.collectAsStateWithLifecycle()
     var isErrorDismissed by remember(uiState) { mutableStateOf(false) }
-
-    // Show a Toast when facing an error. This block triggers when the uiState changes.
-//    LaunchedEffect(uiState) {
-//        val state = uiState
-//        if (state is HomeUiState.Error) {
-//            val errorMessage = state.message
-//            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
-//        }
-//    }
 
     HomeScreen(
         modifier = modifier,
         uiState = uiState,
+        date = dateState.date,
         isErrorDismissed = isErrorDismissed,
         bottomPadding = bottomPadding,
         onProfileClick = onProfileClick,
@@ -924,6 +917,7 @@ fun HomeScreen(
 fun HomeScreen(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
+    date: String,
     isErrorDismissed: Boolean = false,
     bottomPadding: Dp = 0.dp,
     onProfileClick: () -> Unit = {},
@@ -949,6 +943,7 @@ fun HomeScreen(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 drawable = R.drawable.farmer_dp,
                 text = R.string.user,
+                date = date,
                 onProfileClick = onProfileClick // Forwards click event
             )
 
@@ -1165,7 +1160,8 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     SmartKrishiTheme {
         HomeScreen(
-            uiState = HomeUiState.Success(marketPrice = defaultNullMarketPrice)
+            uiState = HomeUiState.Success(marketPrice = defaultNullMarketPrice),
+            date = "12 January, 2025"
         )
     }
 }
