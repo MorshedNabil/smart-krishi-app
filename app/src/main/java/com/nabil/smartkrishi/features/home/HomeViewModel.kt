@@ -17,10 +17,11 @@ import java.util.Locale
 class HomeViewModel(
     private val repository: HomeRepository = HomeRepository()
 ) : ViewModel() {
-
+    // Far date state
     private val _dateState = MutableStateFlow(DateUiState(date = getCurrentFormattedDate()))
     val dateState: StateFlow<DateUiState> = _dateState.asStateFlow()
 
+    // Home UI State
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
