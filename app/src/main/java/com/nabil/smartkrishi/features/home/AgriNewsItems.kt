@@ -7,4 +7,4 @@ data class NewsItem(
     @DrawableRes val image: Int,
     @StringRes val title: Int,
     @StringRes val date: Int,
-    )
+)

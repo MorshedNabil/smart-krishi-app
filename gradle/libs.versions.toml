@@ -13,6 +13,8 @@ pinview = "1.4.4"
 kotlin = "2.4.0"
 coreKtx = "1.15.0"
 activityKtx = "1.13.0" # version changed
+kotlinSerialization = "2.1.0"
+room = "2.6.1"
 
 [libraries]
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
@@ -29,6 +31,9 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version
 pinview = { module = "com.chaos.view:pinview", version.ref = "pinview" }
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -36,4 +41,4 @@ google-gms-google-services = { id = "com.google.gms.google-services", version.re
 # new added lines
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization" }

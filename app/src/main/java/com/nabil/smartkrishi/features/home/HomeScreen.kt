@@ -1,5 +1,7 @@
 package com.nabil.smartkrishi.features.home
 
+import android.util.Log
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -36,6 +38,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.SafetyCheck
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +58,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,12 +66,18 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nabil.smartkrishi.R
+import com.nabil.smartkrishi.data.remote.dto.MarketPriceDto
+import com.nabil.smartkrishi.data.repository.toMarketPriceDO
+import com.nabil.smartkrishi.domain.model.MarketPrice
 import com.nabil.smartkrishi.ui.theme.BackgroundCream
 import com.nabil.smartkrishi.ui.theme.DarkGreenText
 import com.nabil.smartkrishi.ui.theme.KantumruyPro
@@ -100,17 +110,12 @@ val farmerTools = listOf(
     FarmerTool(icon = Icons.Default.EnergySavingsLeaf, title = "Pest Control")
 )
 
-//val navigationItems = listOf(
-//    CategoryItem(icon = Icons.Default.Home, title = R.string.bottom_navigation_home),
-//    CategoryItem(icon = Icons.Default.Inbox, title = R.string.bottom_navigation_profile),
-//    CategoryItem(icon = Icons.Default.Notifications, title = R.string.bottom_navigation_notification),
-//)
-
 // ===================== Composables =====================
 @Composable
 fun HeaderSection(
     @DrawableRes drawable: Int,
     @StringRes text: Int,
+    date: String,
     modifier: Modifier = Modifier,
     onProfileClick: () -> Unit = {}
 ) {
@@ -134,7 +139,7 @@ fun HeaderSection(
                 color = DarkGreenText
             )
             Text(
-                text = "12 January, 2025",
+                text = date,
                 style = MaterialTheme.typography.labelMedium,
                 color = Color(0xFF6B7280),
                 modifier = Modifier.alpha(0.7f)
@@ -588,9 +593,135 @@ fun CommonHomeSection(
     }
 }
 
+// Generates the fallback MarketPrice object directly through your toMarketPriceDO() function
+val defaultNullMarketPrice = MarketPriceDto(
+    id = null,
+    cropTitle = null,
+    pricePerKg = null,
+    unit = null,
+    source = null,
+    marketName = null,
+    marketLocation = null,
+    createdAt = null,
+    updatedAt = null,
+    observedAt = null,
+    currency = null
+).toMarketPriceDO()
+
+@Composable
+fun MarketPriceCard(
+    modifier: Modifier = Modifier,
+    marketPrice: MarketPrice = defaultNullMarketPrice
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = SimpleWhite,
+        shape = MaterialTheme.shapes.large,
+        shadowElevation = 2.dp
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Image Box / Placeholder
+            Box(
+                modifier = Modifier
+                    .size(width = 96.dp, height = 84.dp)
+                    .background(color = Color(0xFFF0F7F2), shape = RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(width = 56.dp, height = 36.dp)
+                        .background(color = Color(0xFFD1D5DB), shape = RoundedCornerShape(8.dp))
+                )
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                // Header: Crop Title + Date Badge
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = marketPrice.cropTitle,
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = KantumruyPro,
+                            color = Color(0xFF111827)
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = Color(0xFFE2EFE7),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    ) {
+                        Text(
+                            text = marketPrice.createdAt,
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Medium,
+                                fontFamily = KantumruyPro,
+                                color = DarkGreenText
+                            )
+                        )
+                    }
+                }
+
+                // Price
+                Text(
+                    text = marketPrice.formattedPrice,
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = KantumruyPro,
+                        color = DarkGreenText
+                    )
+                )
+
+                // Market Name & Location Info Row
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = null,
+                        tint = DarkGreenText,
+                        modifier = Modifier.size(14.dp)
+                    )
+
+                    Text(
+                        text = "${marketPrice.marketName} • ${marketPrice.marketLocation}",
+                        style = TextStyle(
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Normal,
+                            fontFamily = KantumruyPro,
+                            color = TextSecondary
+                        ),
+                        maxLines = 1
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun MarketPricesSection(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    marketPrice: MarketPrice = defaultNullMarketPrice
 ) {
     Column(
         modifier = modifier
@@ -625,83 +756,7 @@ fun MarketPricesSection(
             )
         }
 
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = SimpleWhite,
-            shape = MaterialTheme.shapes.large,
-            shadowElevation = 2.dp
-        ) {
-            Row(
-                modifier = Modifier.padding(14.dp),
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Image Box / Placeholder
-                Box(
-                    modifier = Modifier
-                        .size(width = 96.dp, height = 80.dp)
-                        .background(color = Color(0xFFF0F7F2), shape = RoundedCornerShape(16.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(width = 56.dp, height = 36.dp)
-                            .background(color = Color(0xFFD1D5DB), shape = RoundedCornerShape(8.dp))
-                    )
-                }
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Rice & Wheat Prices",
-                            style = TextStyle(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = KantumruyPro,
-                                color = Color(0xFF111827)
-                            ),
-                            modifier = Modifier.weight(1f)
-                        )
-
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    color = Color(0xFFE2EFE7),
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .padding(horizontal = 8.dp, vertical = 3.dp)
-                        ) {
-                            Text(
-                                text = "Today",
-                                style = TextStyle(
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    fontFamily = KantumruyPro,
-                                    color = DarkGreenText
-                                )
-                            )
-                        }
-                    }
-
-                    Text(
-                        text = "Latest wholesale prices from nearby markets for rice, wheat, and vegetables.",
-                        style = TextStyle(
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Normal,
-                            fontFamily = KantumruyPro,
-                            color = TextSecondary
-                        )
-                    )
-                }
-            }
-        }
+        MarketPriceCard(marketPrice = marketPrice)
     }
 }
 
@@ -822,63 +877,209 @@ fun FarmerToolsSection(
     }
 }
 
-// Full Home Screen
+// ================= Full Home Screen =============
+
+/**
+ * Stateful HomeScreen composable that manages ViewModel state, side effects (Toasts), and data loading.
+ */
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
-    onProfileClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {},
+    viewModel: HomeViewModel = viewModel()
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
-        // Top Space
-        Spacer(modifier = Modifier.height(16.dp))
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val dateState by viewModel.dateState.collectAsStateWithLifecycle()
+    var isErrorDismissed by remember(uiState) { mutableStateOf(false) }
 
-        HeaderSection(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            drawable = R.drawable.farmer_dp,
-            text = R.string.user,
-            onProfileClick = onProfileClick // Forwards click event
-        )
+    HomeScreen(
+        modifier = modifier,
+        uiState = uiState,
+        date = dateState.date,
+        isErrorDismissed = isErrorDismissed,
+        bottomPadding = bottomPadding,
+        onProfileClick = onProfileClick,
+        onRetry = {
+            isErrorDismissed = false
+            viewModel.loadHomeData()
+        },
+        onCancel = {
+            isErrorDismissed = true
+        }
+    )
+}
 
-        Spacer(modifier = Modifier.height(24.dp))
+/**
+ * Stateless HomeScreen composable that renders the UI based purely on the given HomeUiState and callbacks.
+ */
+@Composable
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    uiState: HomeUiState,
+    date: String,
+    isErrorDismissed: Boolean = false,
+    bottomPadding: Dp = 0.dp,
+    onProfileClick: () -> Unit = {},
+    onRetry: () -> Unit = {},
+    onCancel: () -> Unit = {}
+) {
+    // Determine market price data from state
+    val marketPrice = when (uiState) {
+        is HomeUiState.Success -> uiState.marketPrice // in case of success, use the data get from API
+        else -> defaultNullMarketPrice // in case of error/loading, fall back to defaultNullMarketPrice
+    }
 
-        WeatherCard(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            temperature = "25",
-            humidity = "17",
-            sunSetTime = "6:30",
-            sunRiseTime = "5:00"
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        CommonHomeSection(
-            title = R.string.bestInvestmet
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
-            BestInvestmentRow()
+            // Top Space
+            Spacer(modifier = Modifier.height(16.dp))
+
+            HeaderSection(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                drawable = R.drawable.farmer_dp,
+                text = R.string.user,
+                date = date,
+                onProfileClick = onProfileClick // Forwards click event
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            WeatherCard(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                temperature = "25",
+                humidity = "17",
+                sunSetTime = "6:30",
+                sunRiseTime = "5:00"
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            CommonHomeSection(
+                title = R.string.bestInvestmet
+            ) {
+                BestInvestmentRow()
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            MarketPricesSection(marketPrice = marketPrice)
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            FarmerToolsSection()
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            CommonHomeSection(
+                title = R.string.agriNews
+            ) {
+                AutoScrollingNewsList()
+            }
+            // safe padding to move the contents above the bottom navigation bar
+            Spacer(modifier = Modifier.height(bottomPadding + 16.dp))
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        MarketPricesSection()
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        FarmerToolsSection()
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        CommonHomeSection(
-            title = R.string.agriNews
-        ) {
-            AutoScrollingNewsList()
+        // if data loading then show a loading indicator
+        if (uiState is HomeUiState.Loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                androidx.compose.material3.CircularProgressIndicator(
+                    color = DarkGreenText
+                )
+            }
         }
-        // safe padding to move the contents above the bottom navigation bar
-        Spacer(modifier = Modifier.height(bottomPadding + 16.dp))
+        // If data load fails show a error message box
+        if (uiState is HomeUiState.Error && !isErrorDismissed) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Surface(
+                    modifier = Modifier.padding(24.dp),
+                    shape = MaterialTheme.shapes.large,
+                    color = SimpleWhite,
+                    shadowElevation = 4.dp
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Error Loading Data",
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = KantumruyPro,
+                                color = Color.Red
+                            )
+                        )
+                        Text(
+                            text = uiState.message,
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontFamily = KantumruyPro,
+                                color = TextSecondary
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Button(
+                                onClick = onCancel,
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFFE5E7EB)
+                                ),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "Cancel",
+                                    style = TextStyle(
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        fontFamily = KantumruyPro,
+                                        color = Color(0xFF374151)
+                                    )
+                                )
+                            }
+
+                            Button(
+                                onClick = onRetry,
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                    containerColor = DarkGreenText
+                                ),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "Retry",
+                                    style = TextStyle(
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        fontFamily = KantumruyPro,
+                                        color = SimpleWhite
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -938,10 +1139,29 @@ fun HomeScreen(
 //    }
 //}
 
+//@Preview(showBackground = true)
+//@Composable
+//fun MarketPriceCardPreview() {
+//    SmartKrishiTheme {
+//        MarketPriceCard(marketPrice = defaultNullMarketPrice)
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun MarketPricesSectionPreview() {
+//    SmartKrishiTheme {
+//        MarketPricesSection(marketPrice = defaultNullMarketPrice)
+//    }
+//}
+
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
     SmartKrishiTheme {
-        HomeScreen()
+        HomeScreen(
+            uiState = HomeUiState.Success(marketPrice = defaultNullMarketPrice),
+            date = "12 January, 2025"
+        )
     }
 }
