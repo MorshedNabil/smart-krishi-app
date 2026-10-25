@@ -9,9 +9,8 @@ interface ApiService {
     @GET("api/weather")
     suspend fun getWeather(@Query("location") location: String): String
 
+    // API for market Price
     @GET("api/market-prices/latest/")
     suspend fun getMarketPrices(): MarketPriceDto
 
-    @GET("api/farmer-tools")
-    suspend fun getFarmerTools(): String
 }

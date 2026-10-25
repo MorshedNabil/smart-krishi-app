@@ -38,14 +38,6 @@ class HomeRepository(
         }
     }
 
-    /**
-     * Fetches available farmer tools.
-     */
-    suspend fun getFarmerTools(): Result<String> {
-        return runCatching {
-            apiService.getFarmerTools()
-        }
-    }
 }
 
 /**
