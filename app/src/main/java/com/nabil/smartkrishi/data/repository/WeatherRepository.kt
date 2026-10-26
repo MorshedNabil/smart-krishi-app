@@ -41,10 +41,10 @@ class WeatherRepository(
     suspend fun refreshWeather(location: String = "default"): Result<Unit> {
         return runCatching {
             Log.d("WeatherRepository", "Fetching fresh weather for location: $location")
-            val dto = apiService.getWeather(location)
+            val dto = apiService.getWeather(location) // API call for weather data
             val entity = dto.toEntity(location)
             
-            weatherDao.insertWeather(entity)
+            weatherDao.insertWeather(entity) // Store new data into Room DB
             Log.d("WeatherRepository", "Successfully saved updated weather into Room")
             Unit
         }.onFailure { exception ->
