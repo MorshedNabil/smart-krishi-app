@@ -146,7 +146,7 @@ fun DailyWeatherDto.toEntity(): DailyForecastEntity {
 }
 
 /**
- * Converts Room Database Entity to Domain Object (DO) for UI presentation.
+ * Converts Room Database Entity to Domain Object(DO) for UI presentation.
  */
 fun WeatherEntity.toDomainModel(): Weather {
     return Weather(
