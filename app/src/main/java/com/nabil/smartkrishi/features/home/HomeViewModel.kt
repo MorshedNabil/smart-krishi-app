@@ -1,15 +1,13 @@
 package com.nabil.smartkrishi.features.home
 
 import android.app.Application
-import androidx.compose.runtime.Applier
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.nabil.smartkrishi.data.local.AppDatabase
 import com.nabil.smartkrishi.data.location.LocationTracker
 import com.nabil.smartkrishi.data.repository.HomeRepository
 import com.nabil.smartkrishi.data.repository.WeatherRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,6 +29,7 @@ class HomeViewModel(
             weatherDao = AppDatabase.getInstance(application).weatherDao()
         )
     }
+
     // Far date state
     private val _dateState = MutableStateFlow(DateUiState(date = getCurrentFormattedDate()))
     val dateState: StateFlow<DateUiState> = _dateState.asStateFlow()
@@ -43,11 +42,15 @@ class HomeViewModel(
     private val _weatherState = MutableStateFlow<WeatherState>(WeatherState())
     val weatherState: StateFlow<WeatherState> = _weatherState.asStateFlow()
 
+    // Active fetch job handle to avoid duplicate concurrent API calls
+    private var fetchWeatherJob: Job? = null
+
     init {
         loadHomeData()
-        observeAndFetchWeatherData()
+        observeWeatherData()
     }
-    // ============ MarketPrice Section ============
+
+    // ============================ MarketPrice Section =============================
     fun loadHomeData() {
         viewModelScope.launch {
             _uiState.value = HomeUiState.Loading
@@ -59,24 +62,30 @@ class HomeViewModel(
             }
         }
     }
-    // ============ Weather Section ============
-    fun observeAndFetchWeatherData() {
-        // To get cached weather data from Room DB
+
+    // ============================= Weather Section =============================
+    
+    /**
+     * Continuously observes cached weather data from Room DB.
+     * Whenever Room DB updates (e.g. after fresh fetch), Room automatically emits the new weather to [_weatherState].
+     */
+    fun observeWeatherData() {
         viewModelScope.launch {
             weatherRepository.getWeatherStream("default").collect { weather ->
                 _weatherState.value = WeatherState(weather = weather)
             }
         }
-        
-        // Try fetching initial weather using GPS coordinates
-        fetchWeatherFromGps()
     }
 
     /**
      * Uses LocationTracker to get current GPS coordinates from device, then updates Room DB.
+     * Prevents duplicate concurrent API calls if a fetch is already in progress.
      */
     fun fetchWeatherFromGps() {
-        viewModelScope.launch {
+        // Guard against duplicate concurrent calls
+        if (fetchWeatherJob?.isActive == true) return
+
+        fetchWeatherJob = viewModelScope.launch {
             val locationTracker = LocationTracker(getApplication())
             val location = locationTracker.getCurrentLocation()
             if (location != null) {

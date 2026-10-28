@@ -1,7 +1,9 @@
 package com.nabil.smartkrishi.features.home
 
 import android.Manifest
+import android.app.Activity
 import android.content.pm.PackageManager
+import com.nabil.smartkrishi.data.location.LocationTracker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -241,7 +243,7 @@ fun WeatherCard(
             // Temperature and Sun set/rise time Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 // Temperature Column
                 Column(
@@ -276,7 +278,8 @@ fun WeatherCard(
                         .align(Alignment.Bottom)
                 ) {
                     Text(
-                        modifier = Modifier.align(Alignment.End),
+                        modifier = Modifier
+                            .align(Alignment.End),
                         text = buildAnnotatedString {
                             append("Sun Rise:  ")
                             withStyle(
@@ -897,11 +900,16 @@ fun HomeScreen(
     ) { permissions ->
         val isGranted = permissions.values.any { it }
         if (isGranted) {
+            val locationTracker = LocationTracker(context)
+            if (!locationTracker.isGpsEnabled()) {
+                val activity = context as? Activity
+                locationTracker.promptEnableGps(activity)
+            }
             viewModel.fetchWeatherFromGps()
         }
     }
 
-    // Check location permission on launch
+    // Check location permission and GPS state on launch
     LaunchedEffect(Unit) {
         val hasFineLocation = ContextCompat.checkSelfPermission(
             context,
@@ -914,6 +922,11 @@ fun HomeScreen(
         ) == PackageManager.PERMISSION_GRANTED
 
         if (hasFineLocation || hasCoarseLocation) {
+            val locationTracker = LocationTracker(context)
+            if (!locationTracker.isGpsEnabled()) {
+                val activity = context as? Activity
+                locationTracker.promptEnableGps(activity)
+            }
             viewModel.fetchWeatherFromGps()
         } else {
             locationPermissionLauncher.launch(
@@ -969,7 +982,7 @@ fun HomeScreen(
     val weather = weatherState.weather
     val locationText = if (weather != null && weather.location.isNotBlank() && weather.location != "default") weather.location else "Rahitpur, Panchagar, Rangpur"
     val tempText = weather?.temperature?.toInt()?.toString() ?: "25"
-    val humidityText = weather?.relativeHumidity?.toString() ?: "17"
+    val humidityText = weather?.relativeHumidity?.toInt()?.toString() ?: "17"
     val sunriseText = weather?.dailyForecasts?.firstOrNull()?.sunrise?.ifBlank { "5:00 AM" } ?: "5:00 AM"
     val sunsetText = weather?.dailyForecasts?.firstOrNull()?.sunset?.ifBlank { "6:30 PM" } ?: "6:30 PM"
 
