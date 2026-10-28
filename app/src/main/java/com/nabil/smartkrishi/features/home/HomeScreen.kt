@@ -3,6 +3,7 @@ package com.nabil.smartkrishi.features.home
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.widget.Space
 import com.nabil.smartkrishi.data.location.LocationTracker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -243,7 +244,7 @@ fun WeatherCard(
             // Temperature and Sun set/rise time Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceAround,
             ) {
                 // Temperature Column
                 Column(
@@ -274,7 +275,7 @@ fun WeatherCard(
                 // Sunrise/Sunset Column
                 Column(
                     modifier = Modifier
-                        .width(100.dp)
+                        .width(110.dp)
                         .align(Alignment.Bottom)
                 ) {
                     Text(
@@ -983,8 +984,8 @@ fun HomeScreen(
     val locationText = if (weather != null && weather.location.isNotBlank() && weather.location != "default") weather.location else "Rahitpur, Panchagar, Rangpur"
     val tempText = weather?.temperature?.toInt()?.toString() ?: "25"
     val humidityText = weather?.relativeHumidity?.toInt()?.toString() ?: "17"
-    val sunriseText = weather?.dailyForecasts?.firstOrNull()?.sunrise?.ifBlank { "5:00 AM" } ?: "5:00 AM"
-    val sunsetText = weather?.dailyForecasts?.firstOrNull()?.sunset?.ifBlank { "6:30 PM" } ?: "6:30 PM"
+    val sunriseText = weather?.dailyForecasts?.firstOrNull()?.sunrise?.ifBlank { "05:00 AM" } ?: "05:00 AM"
+    val sunsetText = weather?.dailyForecasts?.firstOrNull()?.sunset?.ifBlank { "06:30 PM" } ?: "06:30 PM"
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
