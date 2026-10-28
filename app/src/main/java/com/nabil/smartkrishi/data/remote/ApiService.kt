@@ -7,9 +7,12 @@ import retrofit2.http.Query
 
 
 interface ApiService {
-    // API for weather data
+    // API for weather data (supports lat/lon GPS coordinates or location query)
     @GET("api/weather/")
-    suspend fun getWeather(@Query("location") location: String = "default"): WeatherResponseDto
+    suspend fun getWeather(
+        @Query("latitude") latitude: Double? = null,
+        @Query("longitude") longitude: Double? = null
+    ): WeatherResponseDto
 
     // API for market Price
     @GET("api/market-prices/latest/")

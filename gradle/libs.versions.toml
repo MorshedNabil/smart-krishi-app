@@ -10,16 +10,19 @@ constraintlayout = "2.2.1"
 googleGmsGoogleServices = "4.5.0"
 firebaseAuth = "24.0.1"
 pinview = "1.4.4"
-kotlin = "2.4.0"
+kotlin = "2.2.10"
+ksp = "2.2.10-2.0.2"
 coreKtx = "1.15.0"
 activityKtx = "1.13.0" # version changed
-kotlinSerialization = "2.1.0"
-room = "2.6.1"
+kotlinSerialization = "2.2.10"
+room = "2.8.5"
+playServicesLocation = "21.3.0"
 
 [libraries]
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-database = { module = "com.google.firebase:firebase-database" }
 google-firebase-auth = { module = "com.google.firebase:firebase-auth" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -42,3 +45,4 @@ google-gms-google-services = { id = "com.google.gms.google-services", version.re
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

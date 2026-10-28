@@ -35,20 +35,35 @@ class WeatherRepository(
     }
 
     /**
-     * Fetches latest weather from Django backend and saves it into Room DB.
-     * Saving to Room triggers [getWeatherStream] to automatically emit updated data to the UI.
+     * Fetches latest weather from Django backend using default/fallback coordinates.
      */
-    suspend fun refreshWeather(location: String = "default"): Result<Unit> {
+    suspend fun refreshWeather(
+        defaultLat: Double = 23.8103,
+        defaultLon: Double = 90.4125,
+        locationKey: String = "default"
+    ): Result<Unit> {
+        return refreshWeatherForCoordinates(lat = defaultLat, lon = defaultLon, locationKey = locationKey)
+    }
+
+    /**
+     * Fetches latest weather from Django backend using GPS latitude & longitude coordinates,
+     * and saves it into Room DB.
+     */
+    suspend fun refreshWeatherForCoordinates(
+        lat: Double,
+        lon: Double,
+        locationKey: String = "default"
+    ): Result<Unit> {
         return runCatching {
-            Log.d("WeatherRepository", "Fetching fresh weather for location: $location")
-            val dto = apiService.getWeather(location) // API call for weather data
-            val entity = dto.toEntity(location)
-            
-            weatherDao.insertWeather(entity) // Store new data into Room DB
-            Log.d("WeatherRepository", "Successfully saved updated weather into Room")
+            Log.d("WeatherRepository", "Fetching fresh weather for lat: $lat, lon: $lon")
+            val dto = apiService.getWeather(latitude = lat, longitude = lon)
+            val entity = dto.toEntity(locationKey)
+
+            weatherDao.insertWeather(entity)
+            Log.d("WeatherRepository", "Successfully saved GPS weather into Room")
             Unit
         }.onFailure { exception ->
-            Log.e("WeatherRepository", "Failed to refresh weather from backend", exception)
+            Log.e("WeatherRepository", "Failed to refresh weather for GPS coordinates", exception)
         }
     }
 }

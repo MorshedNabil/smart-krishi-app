@@ -4,8 +4,10 @@ import android.app.Application
 import androidx.compose.runtime.Applier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.nabil.smartkrishi.data.local.AppDatabase
+import com.nabil.smartkrishi.data.location.LocationTracker
 import com.nabil.smartkrishi.data.repository.HomeRepository
 import com.nabil.smartkrishi.data.repository.WeatherRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,10 +22,15 @@ import java.util.Locale
  * HomeViewModel handles state logic for Home Screen and triggers Retrofit API calls via HomeRepository.
  */
 class HomeViewModel(
-    application: Application,
-    private val repository: HomeRepository = HomeRepository(),
-    private val weatherRepository: WeatherRepository = WeatherRepository(weatherDao = AppDatabase.getInstance(application).weatherDao())
+    application: Application
 ) : AndroidViewModel(application) {
+
+    private val repository by lazy { HomeRepository() }
+    private val weatherRepository by lazy {
+        WeatherRepository(
+            weatherDao = AppDatabase.getInstance(application).weatherDao()
+        )
+    }
     // Far date state
     private val _dateState = MutableStateFlow(DateUiState(date = getCurrentFormattedDate()))
     val dateState: StateFlow<DateUiState> = _dateState.asStateFlow()
@@ -40,7 +47,7 @@ class HomeViewModel(
         loadHomeData()
         observeAndFetchWeatherData()
     }
-
+    // ============ MarketPrice Section ============
     fun loadHomeData() {
         viewModelScope.launch {
             _uiState.value = HomeUiState.Loading
@@ -52,21 +59,40 @@ class HomeViewModel(
             }
         }
     }
-
+    // ============ Weather Section ============
     fun observeAndFetchWeatherData() {
-        // To fetch fresh weather data from backend
-        viewModelScope.launch {
-            weatherRepository.refreshWeather("default")
-        }
         // To get cached weather data from Room DB
         viewModelScope.launch {
             weatherRepository.getWeatherStream("default").collect { weather ->
                 _weatherState.value = WeatherState(weather = weather)
             }
         }
+        
+        // Try fetching initial weather using GPS coordinates
+        fetchWeatherFromGps()
+    }
+
+    /**
+     * Uses LocationTracker to get current GPS coordinates from device, then updates Room DB.
+     */
+    fun fetchWeatherFromGps() {
+        viewModelScope.launch {
+            val locationTracker = LocationTracker(getApplication())
+            val location = locationTracker.getCurrentLocation()
+            if (location != null) {
+                weatherRepository.refreshWeatherForCoordinates(
+                    lat = location.latitude,
+                    lon = location.longitude
+                )
+            } else {
+                // Fallback to default coordinates if GPS unavailable or permissions denied
+                weatherRepository.refreshWeather()
+            }
+        }
     }
 }
 
+// =============== Helper function to get current date of device ===============
 private fun getCurrentFormattedDate(): String {
     return try {
         LocalDate.now().format(DateTimeFormatter.ofPattern("d MMMM, yyyy", Locale.ENGLISH))
