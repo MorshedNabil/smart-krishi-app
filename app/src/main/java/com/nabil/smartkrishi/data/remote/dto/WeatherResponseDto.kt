@@ -37,7 +37,7 @@ data class CurrentWeatherDto(
     val temperature2m: Double? = null,
 
     @SerialName("relative_humidity_2m")
-    val relativeHumidity2m: Int? = null,
+    val relativeHumidity2m: Double? = null,
 
     @SerialName("is_day")
     val isDay: Int? = null,
@@ -111,7 +111,7 @@ fun WeatherResponseDto.toEntity(location: String = "default"): WeatherEntity {
         location = location,
         time = currentDto.time ?: "",
         temperature2m = currentDto.temperature2m ?: 0.0,
-        relativeHumidity2m = currentDto.relativeHumidity2m ?: 0,
+        relativeHumidity2m = currentDto.relativeHumidity2m ?: 0.0,
         isDay = (currentDto.isDay == 1),
         rain = currentDto.rain ?: 0.0,
         precipitation = currentDto.precipitation ?: 0.0,
@@ -146,7 +146,7 @@ fun DailyWeatherDto.toEntity(): DailyForecastEntity {
 }
 
 /**
- * Converts Room Database Entity to Domain Object (DO) for UI presentation.
+ * Converts Room Database Entity to Domain Object(DO) for UI presentation.
  */
 fun WeatherEntity.toDomainModel(): Weather {
     return Weather(

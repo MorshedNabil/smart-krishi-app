@@ -8,7 +8,7 @@ data class Weather(
     val time: String,
     val temperature: Double,
     val formattedTemperature: String,
-    val relativeHumidity: Int,
+    val relativeHumidity: Double,
     val isDay: Boolean,
     val rain: Double,
     val precipitation: Double,

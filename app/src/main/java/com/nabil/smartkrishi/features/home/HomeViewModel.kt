@@ -1,8 +1,13 @@
 package com.nabil.smartkrishi.features.home
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.nabil.smartkrishi.data.local.AppDatabase
+import com.nabil.smartkrishi.data.location.LocationTracker
 import com.nabil.smartkrishi.data.repository.HomeRepository
+import com.nabil.smartkrishi.data.repository.WeatherRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,8 +20,16 @@ import java.util.Locale
  * HomeViewModel handles state logic for Home Screen and triggers Retrofit API calls via HomeRepository.
  */
 class HomeViewModel(
-    private val repository: HomeRepository = HomeRepository()
-) : ViewModel() {
+    application: Application
+) : AndroidViewModel(application) {
+
+    private val repository by lazy { HomeRepository() }
+    private val weatherRepository by lazy {
+        WeatherRepository(
+            weatherDao = AppDatabase.getInstance(application).weatherDao()
+        )
+    }
+
     // Far date state
     private val _dateState = MutableStateFlow(DateUiState(date = getCurrentFormattedDate()))
     val dateState: StateFlow<DateUiState> = _dateState.asStateFlow()
@@ -25,10 +38,19 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    // Weather UI State
+    private val _weatherState = MutableStateFlow<WeatherState>(WeatherState())
+    val weatherState: StateFlow<WeatherState> = _weatherState.asStateFlow()
+
+    // Active fetch job handle to avoid duplicate concurrent API calls
+    private var fetchWeatherJob: Job? = null
+
     init {
         loadHomeData()
+        observeWeatherData()
     }
 
+    // ============================ MarketPrice Section =============================
     fun loadHomeData() {
         viewModelScope.launch {
             _uiState.value = HomeUiState.Loading
@@ -40,8 +62,46 @@ class HomeViewModel(
             }
         }
     }
+
+    // ============================= Weather Section =============================
+    
+    /**
+     * Continuously observes cached weather data from Room DB.
+     * Whenever Room DB updates (e.g. after fresh fetch), Room automatically emits the new weather to [_weatherState].
+     */
+    fun observeWeatherData() {
+        viewModelScope.launch {
+            weatherRepository.getWeatherStream("default").collect { weather ->
+                _weatherState.value = WeatherState(weather = weather)
+            }
+        }
+    }
+
+    /**
+     * Uses LocationTracker to get current GPS coordinates from device, then updates Room DB.
+     * Prevents duplicate concurrent API calls if a fetch is already in progress.
+     */
+    fun fetchWeatherFromGps() {
+        // Guard against duplicate concurrent calls
+        if (fetchWeatherJob?.isActive == true) return
+
+        fetchWeatherJob = viewModelScope.launch {
+            val locationTracker = LocationTracker(getApplication())
+            val location = locationTracker.getCurrentLocation()
+            if (location != null) {
+                weatherRepository.refreshWeatherForCoordinates(
+                    lat = location.latitude,
+                    lon = location.longitude
+                )
+            } else {
+                // Fallback to default coordinates if GPS unavailable or permissions denied
+                weatherRepository.refreshWeather()
+            }
+        }
+    }
 }
 
+// =============== Helper function to get current date of device ===============
 private fun getCurrentFormattedDate(): String {
     return try {
         LocalDate.now().format(DateTimeFormatter.ofPattern("d MMMM, yyyy", Locale.ENGLISH))

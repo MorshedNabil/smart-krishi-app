@@ -1,7 +1,12 @@
 package com.nabil.smartkrishi.features.home
 
-import android.util.Log
-import android.widget.Toast
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.widget.Space
+import com.nabil.smartkrishi.data.location.LocationTracker
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -14,13 +19,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
@@ -32,17 +35,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowOutward
 import androidx.compose.material.icons.filled.EnergySavingsLeaf
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.SafetyCheck
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,9 +55,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -76,9 +75,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nabil.smartkrishi.R
 import com.nabil.smartkrishi.data.remote.dto.MarketPriceDto
-import com.nabil.smartkrishi.data.repository.toMarketPriceDO
+import com.nabil.smartkrishi.data.remote.dto.toMarketPriceDO
 import com.nabil.smartkrishi.domain.model.MarketPrice
-import com.nabil.smartkrishi.ui.theme.BackgroundCream
 import com.nabil.smartkrishi.ui.theme.DarkGreenText
 import com.nabil.smartkrishi.ui.theme.KantumruyPro
 import com.nabil.smartkrishi.ui.theme.SimpleWhite
@@ -169,6 +167,7 @@ fun HeaderSection(
 @Composable
 fun WeatherCard(
     modifier: Modifier = Modifier,
+    location: String = "Rahitpur, Panchagar, Rangpur",
     temperature: String,
     humidity: String,
     sunSetTime: String,
@@ -209,7 +208,7 @@ fun WeatherCard(
 
 
                     Text(
-                        text = "Rahitpur, Panchagar, Rangpur",
+                        text = location,
                         style = TextStyle(
                             color = Color(0xFF6B7280),
                             fontSize = 15.sp,
@@ -245,7 +244,7 @@ fun WeatherCard(
             // Temperature and Sun set/rise time Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceAround,
             ) {
                 // Temperature Column
                 Column(
@@ -276,11 +275,12 @@ fun WeatherCard(
                 // Sunrise/Sunset Column
                 Column(
                     modifier = Modifier
-                        .width(100.dp)
+                        .width(110.dp)
                         .align(Alignment.Bottom)
                 ) {
                     Text(
-                        modifier = Modifier.align(Alignment.End),
+                        modifier = Modifier
+                            .align(Alignment.End),
                         text = buildAnnotatedString {
                             append("Sun Rise:  ")
                             withStyle(
@@ -291,7 +291,7 @@ fun WeatherCard(
                                     fontWeight = FontWeight.Bold
                                 )
                             ) {
-                                append("$sunRiseTime AM")
+                                append(if (sunRiseTime.contains("AM") || sunRiseTime.contains("PM")) sunRiseTime else "$sunRiseTime AM")
                             }
                         },
                         style = TextStyle(
@@ -320,7 +320,7 @@ fun WeatherCard(
                                     fontFamily = KantumruyPro
                                 )
                             ) {
-                                append("$sunSetTime AM")
+                                append(if (sunSetTime.contains("AM") || sunSetTime.contains("PM")) sunSetTime else "$sunSetTime PM")
                             }
                         },
                         style = TextStyle(
@@ -889,13 +889,60 @@ fun HomeScreen(
     onProfileClick: () -> Unit = {},
     viewModel: HomeViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val dateState by viewModel.dateState.collectAsStateWithLifecycle()
+    val weatherState by viewModel.weatherState.collectAsStateWithLifecycle()
     var isErrorDismissed by remember(uiState) { mutableStateOf(false) }
+
+    // Location Permission Launcher
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val isGranted = permissions.values.any { it }
+        if (isGranted) {
+            val locationTracker = LocationTracker(context)
+            if (!locationTracker.isGpsEnabled()) {
+                val activity = context as? Activity
+                locationTracker.promptEnableGps(activity)
+            }
+            viewModel.fetchWeatherFromGps()
+        }
+    }
+
+    // Check location permission and GPS state on launch
+    LaunchedEffect(Unit) {
+        val hasFineLocation = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val hasCoarseLocation = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasFineLocation || hasCoarseLocation) {
+            val locationTracker = LocationTracker(context)
+            if (!locationTracker.isGpsEnabled()) {
+                val activity = context as? Activity
+                locationTracker.promptEnableGps(activity)
+            }
+            viewModel.fetchWeatherFromGps()
+        } else {
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
 
     HomeScreen(
         modifier = modifier,
         uiState = uiState,
+        weatherState = weatherState,
         date = dateState.date,
         isErrorDismissed = isErrorDismissed,
         bottomPadding = bottomPadding,
@@ -903,6 +950,7 @@ fun HomeScreen(
         onRetry = {
             isErrorDismissed = false
             viewModel.loadHomeData()
+            viewModel.fetchWeatherFromGps()
         },
         onCancel = {
             isErrorDismissed = true
@@ -917,6 +965,7 @@ fun HomeScreen(
 fun HomeScreen(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
+    weatherState: WeatherState = WeatherState(),
     date: String,
     isErrorDismissed: Boolean = false,
     bottomPadding: Dp = 0.dp,
@@ -929,6 +978,14 @@ fun HomeScreen(
         is HomeUiState.Success -> uiState.marketPrice // in case of success, use the data get from API
         else -> defaultNullMarketPrice // in case of error/loading, fall back to defaultNullMarketPrice
     }
+
+    // Extract fetched weather data from weatherState
+    val weather = weatherState.weather
+    val locationText = if (weather != null && weather.location.isNotBlank() && weather.location != "default") weather.location else "Rahitpur, Panchagar, Rangpur"
+    val tempText = weather?.temperature?.toInt()?.toString() ?: "25"
+    val humidityText = weather?.relativeHumidity?.toInt()?.toString() ?: "17"
+    val sunriseText = weather?.dailyForecasts?.firstOrNull()?.sunrise?.ifBlank { "05:00 AM" } ?: "05:00 AM"
+    val sunsetText = weather?.dailyForecasts?.firstOrNull()?.sunset?.ifBlank { "06:30 PM" } ?: "06:30 PM"
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
@@ -951,10 +1008,11 @@ fun HomeScreen(
 
             WeatherCard(
                 modifier = Modifier.padding(horizontal = 24.dp),
-                temperature = "25",
-                humidity = "17",
-                sunSetTime = "6:30",
-                sunRiseTime = "5:00"
+                location = locationText,
+                temperature = tempText,
+                humidity = humidityText,
+                sunSetTime = sunsetText,
+                sunRiseTime = sunriseText
             )
 
             Spacer(modifier = Modifier.height(24.dp))

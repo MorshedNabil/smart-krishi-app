@@ -14,7 +14,7 @@ import com.nabil.smartkrishi.data.local.entity.WeatherEntity
  */
 @Database(
     entities = [WeatherEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(WeatherConverters::class)

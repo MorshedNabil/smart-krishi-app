@@ -15,7 +15,7 @@ data class WeatherEntity(
     // Current Weather Details
     val time: String,
     val temperature2m: Double,
-    val relativeHumidity2m: Int,
+    val relativeHumidity2m: Double,
     val isDay: Boolean,
     val rain: Double,
     val precipitation: Double,
