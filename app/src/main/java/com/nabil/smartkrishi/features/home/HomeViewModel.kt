@@ -39,8 +39,8 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     // Weather UI State
-    private val _weatherState = MutableStateFlow<WeatherState>(WeatherState())
-    val weatherState: StateFlow<WeatherState> = _weatherState.asStateFlow()
+    private val _weatherState = MutableStateFlow<WeatherUIState>(WeatherUIState())
+    val weatherState: StateFlow<WeatherUIState> = _weatherState.asStateFlow()
 
     // Active fetch job handle to avoid duplicate concurrent API calls
     private var fetchWeatherJob: Job? = null
@@ -71,14 +71,15 @@ class HomeViewModel(
      */
     fun observeWeatherData() {
         viewModelScope.launch {
-            weatherRepository.getWeatherStream("default").collect { weather ->
-                _weatherState.value = WeatherState(weather = weather)
+            weatherRepository.getWeatherStream().collect { weather ->
+                _weatherState.value = WeatherUIState(weather = weather)
             }
         }
     }
 
     /**
-     * Uses LocationTracker to get current GPS coordinates from device, then updates Room DB.
+     * Uses LocationTracker to get current GPS coordinates from device, resolves the human-readable location
+     * via Geocoder, and updates Room DB with fresh weather.
      * Prevents duplicate concurrent API calls if a fetch is already in progress.
      */
     fun fetchWeatherFromGps() {
@@ -89,9 +90,16 @@ class HomeViewModel(
             val locationTracker = LocationTracker(getApplication())
             val location = locationTracker.getCurrentLocation()
             if (location != null) {
+                // Use Geocoder to resolve readable place name (e.g. "Panchagarh, Rangpur")
+                val locationName = locationTracker.getReadableLocation(
+                    latitude = location.latitude,
+                    longitude = location.longitude
+                ) ?: "GPS Location"
+
                 weatherRepository.refreshWeatherForCoordinates(
                     lat = location.latitude,
-                    lon = location.longitude
+                    lon = location.longitude,
+                    locationKey = locationName
                 )
             } else {
                 // Fallback to default coordinates if GPS unavailable or permissions denied
