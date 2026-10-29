@@ -28,9 +28,9 @@ class WeatherRepository(
      * Observes weather data from Room as a reactive stream.
      * Always returns cached data immediately if available.
      */
-    fun getWeatherStream(location: String = "default"): Flow<Weather?> {
-        Log.d("WeatherRepository", "Weather data collected from Room for location: $location")
-        return weatherDao.getWeatherFlow(location).map { entity ->
+    fun getWeatherStream(): Flow<Weather?> {
+        Log.d("WeatherRepository", "Weather data stream initialized from Room")
+        return weatherDao.getLatestWeatherFlow().map { entity ->
             entity?.toDomainModel()
         }
     }

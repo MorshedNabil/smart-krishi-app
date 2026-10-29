@@ -9,14 +9,18 @@ import kotlinx.coroutines.flow.Flow
 
 /**
  * Room Data Access Object (DAO) for weather data caching.
- * Dao purpose: to define the methods to access the database.
  */
 @Dao
 interface WeatherDao {
 
     /**
+     * Observes the latest cached weather record reactively.
+     */
+    @Query("SELECT * FROM weather_data ORDER BY lastUpdated DESC LIMIT 1")
+    fun getLatestWeatherFlow(): Flow<WeatherEntity?>
+
+    /**
      * Observes cached weather data for a specific location reactively.
-     * Room will automatically emit updated data through Flow whenever the database changes.
      */
     @Query("SELECT * FROM weather_data WHERE location = :location")
     fun getWeatherFlow(location: String = "default"): Flow<WeatherEntity?>

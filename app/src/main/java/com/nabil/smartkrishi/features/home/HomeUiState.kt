@@ -16,6 +16,6 @@ data class DateUiState(
 )
 
 // UI State for weather
-data class WeatherState(
+data class WeatherUIState(
     val weather: Weather? = null
 )

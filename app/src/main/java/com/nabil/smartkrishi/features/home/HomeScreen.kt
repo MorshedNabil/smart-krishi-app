@@ -965,7 +965,7 @@ fun HomeScreen(
 fun HomeScreen(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
-    weatherState: WeatherState = WeatherState(),
+    weatherState: WeatherUIState = WeatherUIState(),
     date: String,
     isErrorDismissed: Boolean = false,
     bottomPadding: Dp = 0.dp,

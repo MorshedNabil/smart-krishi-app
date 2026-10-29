@@ -20,7 +20,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 /**
- * Utility helper to fetch device GPS coordinates using FusedLocationProviderClient.
+ * Utility helper to fetch device GPS coordinates using FusedLocationProviderClient and resolve location names via Geocoder.
  */
 class LocationTracker(
     private val context: Context
@@ -28,6 +28,8 @@ class LocationTracker(
 
     private val fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
+
+    private val locationGeocoder by lazy { LocationGeocoder(context) }
 
     /**
      * Checks if device GPS / Location service is turned ON in system settings.
@@ -62,6 +64,13 @@ class LocationTracker(
                     })
                 }
             }
+    }
+
+    /**
+     * Converts latitude and longitude coordinates into a human-readable location name (e.g. "Panchagarh, Rangpur").
+     */
+    suspend fun getReadableLocation(latitude: Double, longitude: Double): String? {
+        return locationGeocoder.getReadableLocation(latitude, longitude)
     }
 
     /**
