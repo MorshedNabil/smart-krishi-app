@@ -48,17 +48,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nabil.smartkrishi.R
-
-// Data class representing the SignUp form state
-data class SignUpFormData(
-    val phone: String = "",
-    val nidNumber: String = "",
-    val division: String = "",
-    val district: String = "",
-    val villageName: String = "",
-    val role: String = "Farmer"
-)
 
 private val SignUpBackgroundColor = Color(0xFF2E5A42)
 private val InputFieldBgColor = Color(0xFFC2D16C)
@@ -322,21 +314,55 @@ fun SignUpButton(
 }
 
 /**
- * Main SignUp Screen Composable.
+ * Stateful SignUpScreen entry point that connects to [SignUpViewModel].
  */
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
+    viewModel: SignUpViewModel = viewModel(),
     divisions: List<String> = listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh"),
     districts: List<String> = listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh"),
     onSignUpClick: (SignUpFormData) -> Unit = {}
 ) {
-    var phone by remember { mutableStateOf("") }
-    var nidNumber by remember { mutableStateOf("") }
-    var selectedDivision by remember { mutableStateOf("") }
-    var selectedDistrict by remember { mutableStateOf("") }
-    var villageName by remember { mutableStateOf("") }
-    var selectedRole by remember { mutableStateOf("Farmer") }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    SignUpContent(
+        modifier = modifier,
+        uiState = uiState,
+        divisions = divisions,
+        districts = districts,
+        onPhoneChange = viewModel::updatePhone,
+        onNidChange = viewModel::updateNid,
+        onDivisionSelected = viewModel::updateDivision,
+        onDistrictSelected = viewModel::updateDistrict,
+        onVillageChange = viewModel::updateVillage,
+        onRoleSelected = viewModel::updateRole,
+        onSignUpClick = {
+            if (viewModel.validateAndSignUp()) {
+                onSignUpClick(uiState.formData)
+            }
+        }
+    )
+}
+
+/**
+ * Stateless SignUpContent rendering UI purely based on [SignUpUIState].
+ */
+@Composable
+fun SignUpContent(
+    uiState: SignUpUIState,
+    modifier: Modifier = Modifier,
+    divisions: List<String> = listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh"),
+    districts: List<String> = listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh"),
+    onPhoneChange: (String) -> Unit = {},
+    onNidChange: (String) -> Unit = {},
+    onDivisionSelected: (String) -> Unit = {},
+    onDistrictSelected: (String) -> Unit = {},
+    onVillageChange: (String) -> Unit = {},
+    onRoleSelected: (String) -> Unit = {},
+    onSignUpClick: () -> Unit = {}
+) {
+    val formData = uiState.formData
 
     Box(
         modifier = modifier
@@ -380,15 +406,15 @@ fun SignUpScreen(
                 // Phone Field
                 FormLabel(text = "Phone")
                 PhoneInputField(
-                    phoneValue = phone,
-                    onPhoneChange = { phone = it }
+                    phoneValue = formData.phone,
+                    onPhoneChange = onPhoneChange
                 )
 
                 // NID Field
                 FormLabel(text = "Nid")
                 FormTextField(
-                    value = nidNumber,
-                    onValueChange = { nidNumber = it },
+                    value = formData.nidNumber,
+                    onValueChange = onNidChange,
                     hint = "Enter NID number",
                     keyboardType = KeyboardType.Number
                 )
@@ -396,34 +422,34 @@ fun SignUpScreen(
                 // Division Dropdown Field
                 FormLabel(text = "Division")
                 FormDropdownField(
-                    selectedOption = selectedDivision,
+                    selectedOption = formData.division,
                     options = divisions,
-                    onOptionSelected = { selectedDivision = it },
+                    onOptionSelected = onDivisionSelected,
                     hint = "Select Division"
                 )
 
                 // District Dropdown Field
                 FormLabel(text = "District")
                 FormDropdownField(
-                    selectedOption = selectedDistrict,
+                    selectedOption = formData.district,
                     options = districts,
-                    onOptionSelected = { selectedDistrict = it },
+                    onOptionSelected = onDistrictSelected,
                     hint = "Select District"
                 )
 
                 // Village Field
                 FormLabel(text = "Village Name")
                 FormTextField(
-                    value = villageName,
-                    onValueChange = { villageName = it },
+                    value = formData.villageName,
+                    onValueChange = onVillageChange,
                     hint = "Enter village name"
                 )
 
                 // Role Radio Group
                 FormLabel(text = "Sign up as")
                 RoleSelectionGroup(
-                    selectedRole = selectedRole,
-                    onRoleSelected = { selectedRole = it }
+                    selectedRole = formData.role,
+                    onRoleSelected = onRoleSelected
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -434,18 +460,7 @@ fun SignUpScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     SignUpButton(
-                        onClick = {
-                            onSignUpClick(
-                                SignUpFormData(
-                                    phone = phone,
-                                    nidNumber = nidNumber,
-                                    division = selectedDivision,
-                                    district = selectedDistrict,
-                                    villageName = villageName,
-                                    role = selectedRole
-                                )
-                            )
-                        }
+                        onClick = onSignUpClick
                     )
                 }
 
@@ -459,5 +474,5 @@ fun SignUpScreen(
 @Preview(showBackground = true)
 @Composable
 fun SignUpScreenPreview() {
-    SignUpScreen()
+    SignUpContent(uiState = SignUpUIState())
 }
