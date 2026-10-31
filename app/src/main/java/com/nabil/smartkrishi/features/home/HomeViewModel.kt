@@ -30,15 +30,15 @@ class HomeViewModel(
         )
     }
 
-    // Far date state
+    // ============== Header Date state ==============
     private val _dateState = MutableStateFlow(DateUiState(date = getCurrentFormattedDate()))
     val dateState: StateFlow<DateUiState> = _dateState.asStateFlow()
 
-    // Home UI State
+    // =============== Home UI State ================
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    // Weather UI State
+    // =========== Weather UI State ============
     private val _weatherState = MutableStateFlow<WeatherUIState>(WeatherUIState())
     val weatherState: StateFlow<WeatherUIState> = _weatherState.asStateFlow()
 

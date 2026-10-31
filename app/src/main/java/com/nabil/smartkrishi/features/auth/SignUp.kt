@@ -1,4 +1,4 @@
-package com.nabil.smartkrishi
+package com.nabil.smartkrishi.features.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,8 +6,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.platform.ComposeView
 import com.google.firebase.auth.FirebaseAuth
-import com.nabil.smartkrishi.features.auth.SignUpFormData
-import com.nabil.smartkrishi.features.auth.SignUpScreen
+import com.nabil.smartkrishi.OtpVerification
+import com.nabil.smartkrishi.R
 import com.nabil.smartkrishi.ui.theme.SmartKrishiTheme
 
 class SignUp : AppCompatActivity() {
@@ -67,7 +67,7 @@ class SignUp : AppCompatActivity() {
     }
 
     private fun sendToMain() {
-        val intent = Intent(this, OnBoardActivity::class.java)
+        val intent = Intent(this, OtpVerification::class.java)
         startActivity(intent)
         finish()
     }
