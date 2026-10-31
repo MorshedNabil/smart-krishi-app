@@ -4,14 +4,11 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
-import androidx.compose.ui.test.hasContentDescription
-import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nabil.smartkrishi.ui.theme.SmartKrishiTheme
 import org.junit.Assert.assertEquals
@@ -83,56 +80,6 @@ class SignUpScreenTest {
 
         // Verify Submitted Form Data
         assertNotNull("Submitted form data should not be null", submittedData)
-        assertEquals("1712345678", submittedData?.phone)
-        assertEquals("1234567890", submittedData?.nidNumber)
-        assertEquals("Dhaka", submittedData?.division)
-        assertEquals("Chittagong", submittedData?.district)
-        assertEquals("Rahitpur", submittedData?.villageName)
-        assertEquals("Vendor", submittedData?.role)
-    }
-
-    @Test
-    fun signUpScreen_userFillsAllFormFields_triggersOnSignUpClickWithCorrectData() {
-        var submittedData: SignUpFormData? = null
-
-        composeTestRule.setContent {
-            SmartKrishiTheme {
-                SignUpScreen(
-                    onSignUpClick = { data ->
-                        submittedData = data
-                    }
-                )
-            }
-        }
-
-        // Input Phone Number
-        composeTestRule.onNode(hasSetTextAction() and (hasContentDescription("Enter phone number") or hasText("Enter phone number")))
-            .performTextReplacement("1712345678")
-
-        // Input NID Number
-        composeTestRule.onNode(hasSetTextAction() and (hasContentDescription("Enter NID number") or hasText("Enter NID number")))
-            .performTextReplacement("1234567890")
-
-        // Select Division
-        composeTestRule.onNodeWithText("Select Division").performClick()
-        composeTestRule.onNodeWithText("Dhaka").performClick()
-
-        // Select District
-        composeTestRule.onNodeWithText("Select District").performClick()
-        composeTestRule.onNodeWithText("Chittagong").performClick()
-
-        // Input Village Name
-        composeTestRule.onNode(hasSetTextAction() and (hasContentDescription("Enter village name") or hasText("Enter village name")))
-            .performTextReplacement("Rahitpur")
-
-        // Select Role: "Vendor"
-        composeTestRule.onNodeWithText("Vendor").performClick()
-
-        // Click the clickable "Sign up" button
-        composeTestRule.onNode(hasText("Sign up") and hasClickAction()).performClick()
-
-        // Verify Submitted Form Data
-        assertNotNull("Submitted form data should not be null after filling all fields", submittedData)
         assertEquals("1712345678", submittedData?.phone)
         assertEquals("1234567890", submittedData?.nidNumber)
         assertEquals("Dhaka", submittedData?.division)
