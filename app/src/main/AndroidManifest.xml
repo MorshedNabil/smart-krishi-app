@@ -28,7 +28,7 @@
             android:name=".OtpVerification"
             android:exported="true" />
         <activity
-            android:name=".SignUp"
+            android:name=".features.auth.SignUp"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
