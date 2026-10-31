@@ -3,12 +3,12 @@ package com.nabil.smartkrishi.features.auth
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasClickAction
-import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nabil.smartkrishi.ui.theme.SmartKrishiTheme
 import org.junit.Assert.assertEquals
@@ -75,8 +75,14 @@ class SignUpScreenTest {
             }
         }
 
-        // Click the clickable "Sign up" button
-        composeTestRule.onNode(hasText("Sign up") and hasClickAction()).performClick()
+        // Scroll to the SignUp button inside the scrollable column, then perform click
+        /*
+            Calling .performClick() directly on an off-screen node inside a verticalScroll silently ignores the click because
+            Compose requires interactive elements to be scrolled into view before receiving touch events.
+         */
+        composeTestRule.onNodeWithTag("btn_signup")
+            .performScrollTo()
+            .performClick()
 
         // Verify Submitted Form Data
         assertNotNull("Submitted form data should not be null", submittedData)

@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.material.icons.Icons
@@ -305,6 +306,7 @@ fun SignUpButton(
         colors = ButtonDefaults.buttonColors(containerColor = ButtonBgColor),
         shape = RoundedCornerShape(28.dp),
         modifier = modifier
+            .testTag("btn_signup")
             .width(180.dp)
             .height(55.dp)
     ) {
