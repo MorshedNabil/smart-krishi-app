@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
@@ -150,7 +152,9 @@ fun FormTextField(
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
                 cursorBrush = SolidColor(Color.White),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { contentDescription = hint }
             )
         }
     }
@@ -339,7 +343,7 @@ fun SignUpScreen(
         onRoleSelected = viewModel::updateRole,
         onSignUpClick = {
             if (viewModel.validateAndSignUp()) {
-                onSignUpClick(uiState.formData)
+                onSignUpClick(viewModel.uiState.value.formData)
             }
         }
     )
