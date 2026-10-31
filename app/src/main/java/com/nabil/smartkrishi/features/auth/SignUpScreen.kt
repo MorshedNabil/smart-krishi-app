@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -375,7 +376,6 @@ fun SignUpContent(
             .fillMaxSize()
             .background(SignUpBackgroundColor)
     ) {
-        // Bottom Illustration background image
         Image(
             painter = painterResource(id = R.drawable.farming_illustration),
             contentDescription = null,
@@ -384,7 +384,8 @@ fun SignUpContent(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .height(377.dp)
-                .alpha(0.2f)
+                .offset(y = 50.dp)
+                .alpha(0.3f)
         )
 
         Column(
