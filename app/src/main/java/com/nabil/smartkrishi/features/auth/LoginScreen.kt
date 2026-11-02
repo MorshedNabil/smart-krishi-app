@@ -204,7 +204,7 @@ fun GetOtpButton(
 }
 
 /**
- * Main Login / Main Screen Composable.
+ * Main Login Screen Composable.
  */
 @Composable
 fun LoginScreen(
