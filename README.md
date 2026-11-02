@@ -24,10 +24,10 @@ Our goal is to reduce price exploitation and ensure farmers receive the value th
 ---
 
 ## 🛠 Tech Stack
-- **Mobile App Development:** Java  
-- **Backend API:** FastAPI (Python)  
+- **Mobile App Development:** Kotlin, Jetpack Compose, Retrofit, Room
+- **Backend API:** Django Rest Framework (Python)  
 - **Machine Learning:** Python  
-- **Database:** MySQL  
+- **Database:** PostgreSQL  
 
 ---
 
