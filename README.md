@@ -43,12 +43,38 @@ Our goal is to reduce price exploitation and ensure farmers receive the value th
 
 ## 🏗 System Architecture
 ```mermaid
-flowchart TD
-    A[Mobile App - Java Android] --> B[Backend Server - FastAPI]
-    B --> A
-    B --> C[ML Price Prediction Model - Python]
-    C --> B
-    B --> D[MySQL Database]
+flowchart TB
+
+    subgraph Android["Android Application"]
+        UI["Jetpack Compose UI"]
+        VM["ViewModel"]
+        Repo["Repository"]
+        Retrofit["Retrofit API Client"]
+        Room[("Room Database")]
+
+        UI --> VM
+        VM --> Repo
+        Repo --> Room
+        Repo --> Retrofit
+    end
+
+    subgraph Backend["Backend Infrastructure"]
+        Django["Django REST Framework"]
+        DB[("PostgreSQL Database")]
+
+        Django <--> DB
+    end
+
+    Firebase["Firebase Phone Authentication"]
+    Cloudinary["Cloudinary Image Storage"]
+
+    Firebase -->|"Firebase ID Token"| UI
+
+    Retrofit <-->|"HTTPS / REST API"| Django
+
+    Retrofit -.->|"Authenticated requests"| Django
+
+    UI <-->|"Direct Image Upload"| Cloudinary
 ```
 ## 🚀 Future Improvements
 
