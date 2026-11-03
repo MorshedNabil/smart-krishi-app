@@ -234,7 +234,7 @@ public class OtpVerification extends AppCompatActivity {
     }
 
     private void sendToMain() {
-        Intent intent = new Intent(OtpVerification.this, OnBoardActivity.class);
+        Intent intent = new Intent(OtpVerification.this, MainActivity.class);
         startActivity(intent);
         finish();
     }

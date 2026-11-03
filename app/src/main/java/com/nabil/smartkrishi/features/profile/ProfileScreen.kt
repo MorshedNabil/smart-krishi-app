@@ -400,8 +400,8 @@ fun SaveChangeButton(
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel = viewModel(),
-    onSaveClick: (ProfileUiState) -> Unit,
-    onBackClick: () -> Unit
+    onSaveClick: (ProfileUiState) -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

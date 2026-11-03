@@ -1,5 +1,6 @@
 package com.nabil.smartkrishi.features.auth
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,12 +28,14 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
@@ -44,6 +47,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nabil.smartkrishi.R
 
 private val LoginBackgroundColor = Color(0xFF2E5A42)
@@ -204,14 +209,42 @@ fun GetOtpButton(
 }
 
 /**
- * Main Login Screen Composable.
+ * Stateful LoginScreen entry point connected to [LoginViewModel].
  */
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    phoneValue: String = "",
-    errorMessage: String? = null,
-    isEnglish: Boolean = true,
+    viewModel: LoginViewModel = viewModel(),
+    onGetOtpClick: (verificationId: String) -> Unit = {},
+    onSignUpClick: () -> Unit = {}
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LoginContent(
+        modifier = modifier,
+        uiState = uiState,
+        onPhoneChange = viewModel::onPhoneChange,
+        onLanguageToggle = viewModel::onLanguageToggle,
+        onGetOtpClick = {
+            val activity = context as? Activity
+            if (activity != null) {
+                viewModel.requestPhoneVerification(activity) { verificationId ->
+                    onGetOtpClick(verificationId)
+                }
+            }
+        },
+        onSignUpClick = onSignUpClick
+    )
+}
+
+/**
+ * Stateless LoginContent composable rendering UI purely based on [LoginUiState].
+ */
+@Composable
+fun LoginContent(
+    uiState: LoginUiState,
+    modifier: Modifier = Modifier,
     onPhoneChange: (String) -> Unit = {},
     onLanguageToggle: (Boolean) -> Unit = {},
     onGetOtpClick: () -> Unit = {},
@@ -222,7 +255,7 @@ fun LoginScreen(
             .fillMaxSize()
             .background(LoginBackgroundColor)
     ) {
-        // Bottom Illustration background image shifted down to bottom of screen
+        // Bottom Illustration background image shifted down
         Image(
             painter = painterResource(id = R.drawable.farming_illustration),
             contentDescription = null,
@@ -261,7 +294,7 @@ fun LoginScreen(
                         fontWeight = FontWeight.Bold
                     )
                     LanguageSwitch(
-                        isEnglish = isEnglish,
+                        isEnglish = uiState.isEnglish,
                         onLanguageToggle = onLanguageToggle
                     )
                 }
@@ -279,7 +312,7 @@ fun LoginScreen(
 
                 // Phone Input Field
                 LoginPhoneInputField(
-                    phoneValue = phoneValue,
+                    phoneValue = uiState.phoneInput,
                     onPhoneChange = onPhoneChange
                 )
 
@@ -311,10 +344,10 @@ fun LoginScreen(
                 }
 
                 // Error Message if present
-                if (!errorMessage.isNullOrEmpty()) {
+                if (!uiState.errorMessage.isNullOrEmpty()) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = errorMessage,
+                        text = uiState.errorMessage,
                         color = Color(0xFFFF6B6B),
                         fontSize = 16.sp,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -330,5 +363,5 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen()
+    LoginContent(uiState = LoginUiState())
 }

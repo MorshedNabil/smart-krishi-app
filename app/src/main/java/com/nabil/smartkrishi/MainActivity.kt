@@ -2,128 +2,91 @@ package com.nabil.smartkrishi
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.ComposeView
-import com.google.firebase.FirebaseException
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
 import com.nabil.smartkrishi.features.auth.LoginScreen
-import com.nabil.smartkrishi.features.auth.SignUp
+import com.nabil.smartkrishi.features.auth.SignUpScreen
+import com.nabil.smartkrishi.features.profile.ProfileScreen
+import com.nabil.smartkrishi.navigation.OnBoardScreen
 import com.nabil.smartkrishi.ui.theme.SmartKrishiTheme
-import java.util.concurrent.TimeUnit
 
 /**
- * Main Login activity migrating to Jetpack Compose with Firebase Phone Auth.
+ * Single Activity entry point for Smart Krishi app hosting Compose Navigation.
  */
-class MainActivity : AppCompatActivity() {
-
-    private lateinit var auth: FirebaseAuth
-    private lateinit var verificationCallbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
-
-    private var phoneInput by mutableStateOf("")
-    private var errorMessage by mutableStateOf<String?>(null)
-    private var isEnglish by mutableStateOf(true)
+class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
 
-        auth = FirebaseAuth.getInstance()
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val startDestination = if (currentUser != null) "onboard" else "login"
 
-        setupPhoneAuthCallbacks()
-
-        val composeView = findViewById<ComposeView>(R.id.compose_view)
-        composeView.setContent {
+        setContent {
             SmartKrishiTheme {
-                LoginScreen(
-                    phoneValue = phoneInput,
-                    errorMessage = errorMessage,
-                    isEnglish = isEnglish,
-                    onPhoneChange = {
-                        phoneInput = it
-                        if (!errorMessage.isNullOrEmpty()) errorMessage = null
-                    },
-                    onLanguageToggle = { isEnglish = it },
-                    onGetOtpClick = { requestPhoneVerification() },
-                    onSignUpClick = {
-                        val intent = Intent(this@MainActivity, SignUp::class.java)
-                        startActivity(intent)
+                val navController = rememberNavController()
+
+                NavHost(
+                    navController = navController,
+                    startDestination = startDestination,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    composable("login") {
+                        LoginScreen(
+                            onGetOtpClick = { verificationId ->
+                                val otpIntent = Intent(this@MainActivity, OtpVerification::class.java).apply {
+                                    putExtra("verification_pin", verificationId)
+                                }
+                                startActivity(otpIntent)
+                            },
+                            onSignUpClick = {
+                                navController.navigate("signup")
+                            }
+                        )
                     }
-                )
-            }
-        }
-    }
 
-    private fun requestPhoneVerification() {
-        val phone = phoneInput.trim()
-        if (phone.isEmpty()) {
-            errorMessage = "Please enter phone number"
-            return
-        }
+                    composable("signup") {
+                        SignUpScreen(
+                            onSignUpClick = {
+                                navController.navigate("onboard") {
+                                    popUpTo("login") { inclusive = true }
+                                }
+                            }
+                        )
+                    }
 
-        val phoneNumber = "+880$phone"
-        val options = PhoneAuthOptions.newBuilder(auth)
-            .setPhoneNumber(phoneNumber)
-            .setTimeout(60L, TimeUnit.SECONDS)
-            .setActivity(this)
-            .setCallbacks(verificationCallbacks)
-            .build()
+                    composable("onboard") {
+                        OnBoardScreen(
+                            onProfileClick = {
+                                navController.navigate("profile")
+                            }
+                        )
+                    }
 
-        PhoneAuthProvider.verifyPhoneNumber(options)
-    }
-
-    private fun setupPhoneAuthCallbacks() {
-        verificationCallbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-            override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                signInWithCredential(credential)
-            }
-
-            override fun onVerificationFailed(e: FirebaseException) {
-                errorMessage = e.message ?: "Verification failed"
-                Log.e("MainActivity", "Verification failed", e)
-            }
-
-            override fun onCodeSent(
-                verificationId: String,
-                token: PhoneAuthProvider.ForceResendingToken
-            ) {
-                val otpIntent = Intent(this@MainActivity, OtpVerification::class.java).apply {
-                    putExtra("verification_pin", verificationId)
+                    composable("profile") {
+                        ProfileScreen(
+                            onBackClick = {
+                                navController.popBackStack()
+                            },
+                            onSaveClick = { uiState ->
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Profile saved for ${uiState.name} (${uiState.phoneNumber}) - ${uiState.selectedLocation}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        )
+                    }
                 }
-                startActivity(otpIntent)
             }
         }
-    }
-
-    private fun signInWithCredential(credential: PhoneAuthCredential) {
-        auth.signInWithCredential(credential).addOnCompleteListener(this) { task ->
-            if (task.isSuccessful) {
-                sendToMain()
-            } else {
-                errorMessage = task.exception?.message ?: "Sign in failed"
-            }
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            sendToMain()
-        }
-    }
-
-    private fun sendToMain() {
-        val intent = Intent(this, OnBoardActivity::class.java)
-        startActivity(intent)
-        finish()
     }
 }
