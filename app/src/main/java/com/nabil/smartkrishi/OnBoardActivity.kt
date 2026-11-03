@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.nabil.smartkrishi.features.profile.ProfileActivity
+import com.nabil.smartkrishi.navigation.OnBoardScreen
 import com.nabil.smartkrishi.ui.theme.SmartKrishiTheme
 
 class OnBoardActivity : ComponentActivity() {
