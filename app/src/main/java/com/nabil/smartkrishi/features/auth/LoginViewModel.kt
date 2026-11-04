@@ -14,17 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.concurrent.TimeUnit
 
-/**
- * UI State for the Login Screen.
- */
-data class LoginUiState(
-    val phoneInput: String = "",
-    val errorMessage: String? = null,
-    val isEnglish: Boolean = true,
-    val isLoading: Boolean = false,
-    val isUserLoggedIn: Boolean = false,
-    val verificationId: String? = null
-)
 
 /**
  * ViewModel managing Login state, input validations, and Firebase Phone Authentication.
@@ -33,8 +22,8 @@ class LoginViewModel : ViewModel() {
 
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
 
-    private val _uiState = MutableStateFlow(LoginUiState())
-    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(LoginUIState())
+    val uiState: StateFlow<LoginUIState> = _uiState.asStateFlow()
 
     init {
         checkUserLoggedIn()
@@ -102,6 +91,7 @@ class LoginViewModel : ViewModel() {
                         verificationId = verificationId
                     )
                 }
+                Log.d("LoginViewModel", "Code sent successfully")
                 onCodeSent(verificationId)
             }
         }

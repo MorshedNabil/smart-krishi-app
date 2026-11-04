@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -183,28 +184,41 @@ fun LoginPhoneInputField(
 }
 
 /**
- * Get OTP Action Button.
+ * Get OTP Action Button with loading progress indicator animation.
  */
 @Composable
 fun GetOtpButton(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false
 ) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = ButtonBgColor),
+        enabled = !isLoading,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = ButtonBgColor,
+            disabledContainerColor = ButtonBgColor.copy(alpha = 0.7f)
+        ),
         shape = RoundedCornerShape(28.dp),
         modifier = modifier
             .testTag("btn_get_otp")
             .width(160.dp)
             .height(55.dp)
     ) {
-        Text(
-            text = "Get OTP",
-            color = Color.White,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
+        if (isLoading) {
+            CircularProgressIndicator(
+                color = Color.White,
+                strokeWidth = 3.dp,
+                modifier = Modifier.size(24.dp)
+            )
+        } else {
+            Text(
+                text = "Get OTP",
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
@@ -239,11 +253,11 @@ fun LoginScreen(
 }
 
 /**
- * Stateless LoginContent composable rendering UI purely based on [LoginUiState].
+ * Stateless LoginContent composable rendering UI purely based on [LoginUIState].
  */
 @Composable
 fun LoginContent(
-    uiState: LoginUiState,
+    uiState: LoginUIState,
     modifier: Modifier = Modifier,
     onPhoneChange: (String) -> Unit = {},
     onLanguageToggle: (Boolean) -> Unit = {},
@@ -333,13 +347,14 @@ fun LoginContent(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Get OTP Button
+                // Get OTP Button with Loading Animation
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     GetOtpButton(
-                        onClick = onGetOtpClick
+                        onClick = onGetOtpClick,
+                        isLoading = uiState.isLoading
                     )
                 }
 
@@ -363,5 +378,5 @@ fun LoginContent(
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginContent(uiState = LoginUiState())
+    LoginContent(uiState = LoginUIState(isLoading = true))
 }
