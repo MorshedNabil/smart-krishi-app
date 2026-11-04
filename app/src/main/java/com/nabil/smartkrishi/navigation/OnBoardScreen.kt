@@ -1,4 +1,4 @@
-package com.nabil.smartkrishi
+package com.nabil.smartkrishi.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
@@ -36,6 +36,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.nabil.smartkrishi.R
 import com.nabil.smartkrishi.features.home.HomeScreen
 import com.nabil.smartkrishi.ui.theme.BackgroundCream
 import com.nabil.smartkrishi.ui.theme.KantumruyPro
