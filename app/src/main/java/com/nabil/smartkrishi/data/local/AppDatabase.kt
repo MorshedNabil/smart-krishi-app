@@ -6,21 +6,31 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.nabil.smartkrishi.data.local.converters.WeatherConverters
+import com.nabil.smartkrishi.data.local.dao.LocationDao
 import com.nabil.smartkrishi.data.local.dao.WeatherDao
+import com.nabil.smartkrishi.data.local.entity.DistrictEntity
+import com.nabil.smartkrishi.data.local.entity.DivisionEntity
+import com.nabil.smartkrishi.data.local.entity.VillageEntity
 import com.nabil.smartkrishi.data.local.entity.WeatherEntity
 
 /**
  * Main Room Database configuration for Smart Krishi.
  */
 @Database(
-    entities = [WeatherEntity::class],
-    version = 2,
+    entities = [
+        WeatherEntity::class,
+        DivisionEntity::class,
+        DistrictEntity::class,
+        VillageEntity::class
+    ],
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(WeatherConverters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun weatherDao(): WeatherDao
+    abstract fun locationDao(): LocationDao
 
     companion object {
         @Volatile
