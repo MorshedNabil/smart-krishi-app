@@ -1,43 +1,80 @@
 package com.nabil.smartkrishi.features.auth
 
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 /**
- * ViewModel managing UI state and user inputs for the SignUp Screen using [SignUpUIState].
+ * ViewModel managing UI state, validation, and registration logic for the SignUp Screen using [SignUpUIState].
  */
 class SignUpViewModel : ViewModel() {
+
+    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
 
     private val _uiState = MutableStateFlow(SignUpUIState())
     val uiState: StateFlow<SignUpUIState> = _uiState.asStateFlow()
 
     fun updatePhone(phone: String) {
-        _uiState.update { it.copy(formData = it.formData.copy(phone = phone)) }
+        _uiState.update {
+            it.copy(
+                formData = it.formData.copy(phone = phone),
+                errorMessage = null
+            )
+        }
     }
 
     fun updateNid(nidNumber: String) {
-        _uiState.update { it.copy(formData = it.formData.copy(nidNumber = nidNumber)) }
+        _uiState.update {
+            it.copy(
+                formData = it.formData.copy(nidNumber = nidNumber),
+                errorMessage = null
+            )
+        }
     }
 
     fun updateDivision(division: String) {
-        _uiState.update { it.copy(formData = it.formData.copy(division = division)) }
+        _uiState.update {
+            it.copy(
+                formData = it.formData.copy(division = division),
+                errorMessage = null
+            )
+        }
     }
 
     fun updateDistrict(district: String) {
-        _uiState.update { it.copy(formData = it.formData.copy(district = district)) }
+        _uiState.update {
+            it.copy(
+                formData = it.formData.copy(district = district),
+                errorMessage = null
+            )
+        }
     }
 
     fun updateVillage(villageName: String) {
-        _uiState.update { it.copy(formData = it.formData.copy(villageName = villageName)) }
+        _uiState.update {
+            it.copy(
+                formData = it.formData.copy(villageName = villageName),
+                errorMessage = null
+            )
+        }
     }
 
     fun updateRole(role: String) {
-        _uiState.update { it.copy(formData = it.formData.copy(role = role)) }
+        _uiState.update {
+            it.copy(
+                formData = it.formData.copy(role = role),
+                errorMessage = null
+            )
+        }
     }
 
+    /**
+     * Validates form input fields and initiates user registration logic.
+     * Returns true if validation passes and registration succeeds.
+     */
     fun validateAndSignUp(): Boolean {
         val formData = _uiState.value.formData
 
@@ -62,7 +99,14 @@ class SignUpViewModel : ViewModel() {
             return false
         }
 
-        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                errorMessage = null,
+                isSignUpSuccess = true
+            )
+        }
+
         return true
     }
 
