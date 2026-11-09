@@ -327,17 +327,18 @@ fun SignUpButton(
 fun SignUpScreen(
     modifier: Modifier = Modifier,
     viewModel: SignUpViewModel = viewModel(),
-    divisions: List<String> = listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh"),
-    districts: List<String> = listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh"),
     onSignUpClick: (SignUpFormData) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val divisionsList = if (uiState.divisions.isNotEmpty()) uiState.divisions else listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh")
+    val districtsList = if (uiState.districts.isNotEmpty()) uiState.districts else listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh")
+
     SignUpContent(
         modifier = modifier,
         uiState = uiState,
-        divisions = divisions,
-        districts = districts,
+        divisions = divisionsList,
+        districts = districtsList,
         onPhoneChange = viewModel::updatePhone,
         onNidChange = viewModel::updateNid,
         onDivisionSelected = viewModel::updateDivision,

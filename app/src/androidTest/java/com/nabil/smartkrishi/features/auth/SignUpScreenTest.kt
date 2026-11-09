@@ -52,6 +52,46 @@ class SignUpScreenTest {
     }
 
     @Test
+    fun signUpScreen_divisionAndDistrictDropdowns_displayOptionsAndTriggerCallbacks() {
+        var selectedDivision = ""
+        var selectedDistrict = ""
+
+        val testDivisions = listOf("Barishal", "Dhaka", "Rangpur")
+        val testDistricts = listOf("Panchagarh", "Dinajpur")
+
+        composeTestRule.setContent {
+            SmartKrishiTheme {
+                SignUpContent(
+                    uiState = SignUpUIState(
+                        divisions = testDivisions,
+                        districts = testDistricts,
+                        formData = SignUpFormData(
+                            division = selectedDivision,
+                            district = selectedDistrict
+                        )
+                    ),
+                    divisions = testDivisions,
+                    districts = testDistricts,
+                    onDivisionSelected = { selectedDivision = it },
+                    onDistrictSelected = { selectedDistrict = it }
+                )
+            }
+        }
+
+        // Test Division Dropdown: Click field, verify option displays, select option
+        composeTestRule.onNodeWithText("Select Division").performClick()
+        composeTestRule.onNodeWithText("Rangpur").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Rangpur").performClick()
+        assertEquals("Rangpur", selectedDivision)
+
+        // Test District Dropdown: Click field, verify option displays, select option
+        composeTestRule.onNodeWithText("Select District").performClick()
+        composeTestRule.onNodeWithText("Panchagarh").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Panchagarh").performClick()
+        assertEquals("Panchagarh", selectedDistrict)
+    }
+
+    @Test
     fun signUpContent_whenSignUpClicked_triggersCallbackWithCorrectData() {
         var submittedData: SignUpFormData? = null
 
@@ -76,10 +116,6 @@ class SignUpScreenTest {
         }
 
         // Scroll to the SignUp button inside the scrollable column, then perform click
-        /*
-            Calling .performClick() directly on an off-screen node inside a verticalScroll silently ignores the click because
-            Compose requires interactive elements to be scrolled into view before receiving touch events.
-         */
         composeTestRule.onNodeWithTag("btn_signup")
             .performScrollTo()
             .performClick()

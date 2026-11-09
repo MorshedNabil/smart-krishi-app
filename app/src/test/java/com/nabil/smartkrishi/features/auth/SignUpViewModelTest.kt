@@ -1,5 +1,6 @@
 package com.nabil.smartkrishi.features.auth
 
+import android.app.Application
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -16,7 +17,8 @@ class SignUpViewModelTest {
 
     @Before
     fun setUp() {
-        viewModel = SignUpViewModel()
+        val application = Application()
+        viewModel = SignUpViewModel(application)
     }
 
     @Test
