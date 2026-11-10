@@ -3,7 +3,6 @@ package com.nabil.smartkrishi.features.home
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
-import android.widget.Space
 import com.nabil.smartkrishi.data.location.LocationTracker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowOutward
 import androidx.compose.material.icons.filled.EnergySavingsLeaf
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.PriceCheck
 import androidx.compose.material.icons.filled.SafetyCheck
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Button
@@ -103,7 +103,7 @@ val newsItems = listOf(
 
 val farmerTools = listOf(
     FarmerTool(icon = Icons.Default.Timer, title = "Sowing Calendar"),
-    FarmerTool(icon = Icons.Default.ArrowOutward, title = "Fertilizer Guide"),
+    FarmerTool(icon = Icons.Default.PriceCheck, title = "Price Predictor"),
     FarmerTool(icon = Icons.Default.SafetyCheck, title = "Irrigation Plan"),
     FarmerTool(icon = Icons.Default.EnergySavingsLeaf, title = "Pest Control")
 )
@@ -171,7 +171,8 @@ fun WeatherCard(
     temperature: String,
     humidity: String,
     sunSetTime: String,
-    sunRiseTime: String
+    sunRiseTime: String,
+    @DrawableRes weatherIconRes: Int = R.drawable.morning_ic
 ) {
     Surface(
         modifier = modifier
@@ -228,7 +229,7 @@ fun WeatherCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.weather),
+                        painter = painterResource(weatherIconRes),
                         contentDescription = null,
                         modifier = Modifier
                             .size(32.dp)
@@ -832,16 +833,6 @@ fun FarmerToolsSection(
                     fontFamily = KantumruyPro
                 )
             )
-
-            Text(
-                text = "view all",
-                style = TextStyle(
-                    color = DarkGreenText,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = KantumruyPro
-                )
-            )
         }
 
         Column(
@@ -984,7 +975,7 @@ fun HomeScreen(
     val locationText = if (weather != null && weather.location.isNotBlank() && weather.location != "default") weather.location else "Rahitpur, Panchagar, Rangpur"
     val tempText = weather?.temperature?.toInt()?.toString() ?: "25"
     val humidityText = weather?.relativeHumidity?.toInt()?.toString() ?: "17"
-    val sunriseText = weather?.dailyForecasts?.firstOrNull()?.sunrise?.ifBlank { "05:00 AM" } ?: "05:00 AM"
+    val sunriseText = weather?.dailyForecasts?.firstOrNull()?.sunrise?.ifBlank { "05:00 AM" } ?: "05:00 AM" // from dailyForecasts list only take today's sunrise data using firstOrNull()
     val sunsetText = weather?.dailyForecasts?.firstOrNull()?.sunset?.ifBlank { "06:30 PM" } ?: "06:30 PM"
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -1012,7 +1003,8 @@ fun HomeScreen(
                 temperature = tempText,
                 humidity = humidityText,
                 sunSetTime = sunsetText,
-                sunRiseTime = sunriseText
+                sunRiseTime = sunriseText,
+                weatherIconRes = weatherState.weatherIconRes
             )
 
             Spacer(modifier = Modifier.height(24.dp))

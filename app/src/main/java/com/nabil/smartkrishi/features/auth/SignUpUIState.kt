@@ -17,6 +17,8 @@ data class SignUpFormData(
  */
 data class SignUpUIState(
     val formData: SignUpFormData = SignUpFormData(),
+    val divisions: List<String> = emptyList(),
+    val districts: List<String> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val isSignUpSuccess: Boolean = false

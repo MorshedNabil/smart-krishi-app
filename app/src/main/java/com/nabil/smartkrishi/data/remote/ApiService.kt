@@ -1,10 +1,10 @@
 package com.nabil.smartkrishi.data.remote
 
+import com.nabil.smartkrishi.data.remote.dto.DivisionDto
 import com.nabil.smartkrishi.data.remote.dto.MarketPriceDto
 import com.nabil.smartkrishi.data.remote.dto.WeatherResponseDto
 import retrofit2.http.GET
 import retrofit2.http.Query
-
 
 interface ApiService {
     // API for weather data (supports lat/lon GPS coordinates or location query)
@@ -18,4 +18,7 @@ interface ApiService {
     @GET("api/market-prices/latest/")
     suspend fun getMarketPrices(): MarketPriceDto
 
+    // API for fetching administrative location hierarchy (divisions, districts, villages)
+    @GET("api/locations/")
+    suspend fun getLocations(): List<DivisionDto>
 }

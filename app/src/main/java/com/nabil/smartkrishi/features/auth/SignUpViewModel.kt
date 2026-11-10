@@ -1,21 +1,54 @@
 package com.nabil.smartkrishi.features.auth
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.nabil.smartkrishi.data.local.AppDatabase
+import com.nabil.smartkrishi.data.repository.LocationRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /**
- * ViewModel managing UI state, validation, and registration logic for the SignUp Screen using [SignUpUIState].
+ * ViewModel managing UI state, validation, location syncing, and registration for [SignUpScreen].
  */
-class SignUpViewModel : ViewModel() {
+class SignUpViewModel(
+    application: Application
+) : AndroidViewModel(application) {
 
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    private val locationRepository: LocationRepository by lazy {
+        LocationRepository(
+            locationDao = AppDatabase.getInstance(application).locationDao()
+        )
+    }
 
     private val _uiState = MutableStateFlow(SignUpUIState())
     val uiState: StateFlow<SignUpUIState> = _uiState.asStateFlow()
+
+    private var districtFetchJob: Job? = null
+
+    init {
+        syncAndObserveLocations()
+    }
+
+    private fun syncAndObserveLocations() {
+        // Sync locations from backend API into Room DB if Room DB is empty
+        viewModelScope.launch {
+            locationRepository.syncLocationsIfNeeded()
+        }
+
+        // Observe Division names dynamically from Room DB
+        viewModelScope.launch {
+            locationRepository.getDivisionNamesStream().collect { divisionList ->
+                _uiState.update { it.copy(divisions = divisionList) }
+            }
+        }
+    }
 
     fun updatePhone(phone: String) {
         _uiState.update {
@@ -36,11 +69,20 @@ class SignUpViewModel : ViewModel() {
     }
 
     fun updateDivision(division: String) {
+        // Update selected division and reset selected district
         _uiState.update {
             it.copy(
-                formData = it.formData.copy(division = division),
+                formData = it.formData.copy(division = division, district = ""),
                 errorMessage = null
             )
+        }
+
+        // Dynamically fetch and observe District names for the selected division from Room DB
+        districtFetchJob?.cancel()
+        districtFetchJob = viewModelScope.launch {
+            locationRepository.getDistrictNamesStream(division).collect { districtList ->
+                _uiState.update { it.copy(districts = districtList) }
+            }
         }
     }
 
@@ -71,10 +113,6 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Validates form input fields and initiates user registration logic.
-     * Returns true if validation passes and registration succeeds.
-     */
     fun validateAndSignUp(): Boolean {
         val formData = _uiState.value.formData
 

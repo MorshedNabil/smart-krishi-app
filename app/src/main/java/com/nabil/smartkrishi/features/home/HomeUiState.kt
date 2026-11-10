@@ -1,5 +1,7 @@
 package com.nabil.smartkrishi.features.home
 
+import androidx.annotation.DrawableRes
+import com.nabil.smartkrishi.R
 import com.nabil.smartkrishi.domain.model.MarketPrice
 import com.nabil.smartkrishi.domain.model.Weather
 
@@ -17,5 +19,6 @@ data class DateUiState(
 
 // UI State for weather
 data class WeatherUIState(
-    val weather: Weather? = null
+    val weather: Weather? = null,
+    @param:DrawableRes val weatherIconRes: Int = R.drawable.morning_ic
 )
