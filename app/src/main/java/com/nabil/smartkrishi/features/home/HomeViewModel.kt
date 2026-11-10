@@ -12,7 +12,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.nabil.smartkrishi.R
+import com.nabil.smartkrishi.domain.model.Weather
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -66,14 +69,38 @@ class HomeViewModel(
     // ============================= Weather Section =============================
     
     /**
-     * Continuously observes cached weather data from Room DB.
-     * Whenever Room DB updates (e.g. after fresh fetch), Room automatically emits the new weather to [_weatherState].
+     * Continuously observes cached weather data from Room DB and updates weather state
+     * along with night time icon state determined by the phone's current time
+     * and sunrise/sunset values from the weather domain model.
      */
     fun observeWeatherData() {
         viewModelScope.launch {
-            weatherRepository.getWeatherStream().collect { weather ->
-                _weatherState.value = WeatherUIState(weather = weather)
+            weatherRepository.getWeatherStream().collect { weatherItem ->
+                val isNight = isNightTime(weatherItem)
+                val iconRes = if (isNight) R.drawable.night_ic else R.drawable.morning_ic
+                _weatherState.value = WeatherUIState(
+                    weather = weatherItem,
+                    weatherIconRes = iconRes
+                )
             }
+        }
+    }
+
+    /**
+     * Determines whether it is night time using the [Weather.isDay] property from the domain model.
+     * Falls back to device time (6:00 PM - 6:00 AM) if weather data is null.
+     */
+    private fun isNightTime(weather: Weather?): Boolean {
+        if (weather != null) {
+            return !weather.isDay
+        }
+
+        // Fallback default: 6 PM (18:00) to 6 AM (06:00) based on device time
+        return try {
+            val currentHour = LocalTime.now().hour
+            currentHour < 6 || currentHour >= 18
+        } catch (e: Exception) {
+            false
         }
     }
 
