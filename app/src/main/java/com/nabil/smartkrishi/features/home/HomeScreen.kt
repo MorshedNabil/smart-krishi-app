@@ -35,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowOutward
 import androidx.compose.material.icons.filled.EnergySavingsLeaf
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.PriceCheck
 import androidx.compose.material.icons.filled.SafetyCheck
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Button
@@ -102,7 +103,7 @@ val newsItems = listOf(
 
 val farmerTools = listOf(
     FarmerTool(icon = Icons.Default.Timer, title = "Sowing Calendar"),
-    FarmerTool(icon = Icons.Default.ArrowOutward, title = "Fertilizer Guide"),
+    FarmerTool(icon = Icons.Default.PriceCheck, title = "Price Predictor"),
     FarmerTool(icon = Icons.Default.SafetyCheck, title = "Irrigation Plan"),
     FarmerTool(icon = Icons.Default.EnergySavingsLeaf, title = "Pest Control")
 )
@@ -829,16 +830,6 @@ fun FarmerToolsSection(
                     color = colorResource(id = R.color.black),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    fontFamily = KantumruyPro
-                )
-            )
-
-            Text(
-                text = "view all",
-                style = TextStyle(
-                    color = DarkGreenText,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Normal,
                     fontFamily = KantumruyPro
                 )
             )
