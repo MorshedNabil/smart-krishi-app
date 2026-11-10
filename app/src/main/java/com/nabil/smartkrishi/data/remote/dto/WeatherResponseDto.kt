@@ -161,7 +161,8 @@ fun WeatherEntity.toDomainModel(): Weather {
         windSpeed = windSpeed10m,
         hourlyForecasts = hourlyForecasts.map { it.toDomainModel() },
         dailyForecasts = dailyForecasts.map { it.toDomainModel() },
-        lastUpdatedFormatted = formatLastUpdated(lastUpdated)
+        lastUpdatedFormatted = formatLastUpdated(lastUpdated),
+        lastUpdated = lastUpdated
     )
 }
 

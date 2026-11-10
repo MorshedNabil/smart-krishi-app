@@ -87,15 +87,20 @@ class HomeViewModel(
     }
 
     /**
-     * Determines whether it is night time using the [Weather.isDay] property from the domain model.
-     * Falls back to device time (6:00 PM - 6:00 AM) if weather data is null.
+     * Determines whether it is nighttime.
+     * - If fresh fetch weather data is available (fetched within the last 30 minutes),
+     *   it uses the [Weather.isDay] property from the fresh weather data.
+     * - Otherwise (offline or stale cache), it falls back to device time (6:00 PM - 6:00 AM).
      */
     private fun isNightTime(weather: Weather?): Boolean {
-        if (weather != null) {
+        val thirtyMinutesInMillis = 30 * 60 * 1000L
+        val isFreshFetch = weather != null && (System.currentTimeMillis() - weather.lastUpdated) < thirtyMinutesInMillis
+
+        if (isFreshFetch) {
             return !weather.isDay
         }
 
-        // Fallback default: 6 PM (18:00) to 6 AM (06:00) based on device time
+        // Fallback to device time (6 PM - 6 AM) when offline or cache is stale
         return try {
             val currentHour = LocalTime.now().hour
             currentHour < 6 || currentHour >= 18
