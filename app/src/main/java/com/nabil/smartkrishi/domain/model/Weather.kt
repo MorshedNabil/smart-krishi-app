@@ -15,7 +15,8 @@ data class Weather(
     val windSpeed: Double,
     val hourlyForecasts: List<HourlyForecast>,
     val dailyForecasts: List<DailyForecast>,
-    val lastUpdatedFormatted: String
+    val lastUpdatedFormatted: String,
+    val lastUpdated: Long = 0L
 )
 
 data class HourlyForecast(
