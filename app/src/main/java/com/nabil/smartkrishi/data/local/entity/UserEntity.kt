@@ -2,6 +2,8 @@ package com.nabil.smartkrishi.data.local.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.nabil.smartkrishi.domain.model.User
 import kotlinx.serialization.Serializable
@@ -9,14 +11,25 @@ import kotlinx.serialization.Serializable
 /**
  * Room Entity representing a User in the local database.
  */
-@Entity(tableName = "users")
+@Entity(
+    tableName = "users",
+    foreignKeys = [
+        ForeignKey(
+            entity = VillageEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["village_id"],
+            onDelete = ForeignKey.SET_NULL
+        )
+    ],
+    indices = [Index(value = ["village_id"])]
+)
 @Serializable
 data class UserEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
 
     @ColumnInfo(name = "server_id")
-    val serverId: String? = null,
+    val serverId: Int? = null,
 
     @ColumnInfo(name = "first_name")
     val firstName: String,
@@ -37,7 +50,10 @@ data class UserEntity(
     val role: String,
 
     @ColumnInfo(name = "profile_image")
-    val profileImage: String? = null
+    val profileImage: String? = null,
+
+    @ColumnInfo(name = "village_id")
+    val villageId: Int? = null
 )
 
 /**
@@ -53,6 +69,7 @@ fun UserEntity.toDomain(): User {
         lastLogin = lastLogin,
         dateJoined = dateJoined,
         role = role,
-        profileImage = profileImage
+        profileImage = profileImage,
+        villageId = villageId
     )
 }

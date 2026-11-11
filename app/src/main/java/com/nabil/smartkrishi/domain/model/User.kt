@@ -7,15 +7,20 @@ import com.nabil.smartkrishi.data.local.entity.UserEntity
  */
 data class User(
     val id: Long = 0L,
-    val serverId: String? = null,
+    val serverId: Int? = null,
     val firstName: String,
     val lastName: String,
     val phone: String,
     val lastLogin: String? = null,
     val dateJoined: String? = null,
     val role: String,
-    val profileImage: String? = null
-)
+    val profileImage: String? = null,
+    val villageId: Int? = null
+) {
+    val fullName: String
+        get() = "$firstName $lastName".trim()
+}
+
 /**
  * Mapper function to convert Domain User model to UserEntity.
  */
@@ -29,6 +34,7 @@ fun User.toEntity(): UserEntity {
         lastLogin = lastLogin,
         dateJoined = dateJoined,
         role = role,
-        profileImage = profileImage
+        profileImage = profileImage,
+        villageId = villageId
     )
 }

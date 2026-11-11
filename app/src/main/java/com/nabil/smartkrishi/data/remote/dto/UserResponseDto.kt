@@ -25,8 +25,11 @@ data class UserDto(
     @SerialName("phone_number")
     val phoneNumber: String?,
 
-    @SerialName("full_name")
-    val fullName: String?,
+    @SerialName("first_name")
+    val firstName: String?,
+
+    @SerialName("last_name")
+    val lastName: String?,
 
     @SerialName("role")
     val role: String?,
@@ -48,38 +51,38 @@ data class UserDto(
  * Mapper from UserDto to UserEntity.
  */
 fun UserDto.toEntity(): UserEntity {
-    val nameParts = (fullName ?: "").trim().split(" ", limit = 2)
-    val fName = nameParts.getOrNull(0) ?: ""
-    val lName = nameParts.getOrNull(1) ?: ""
+    val fName = firstName ?: ""
+    val lName = lastName ?: ""
 
     return UserEntity(
-        serverId = id?.toString() ?: firebaseUid,
+        serverId = id,
         firstName = fName,
         lastName = lName,
         phone = phoneNumber ?: "",
         lastLogin = updatedAt,
         dateJoined = createdAt,
         role = role ?: "user",
-        profileImage = profileImage
+        profileImage = profileImage,
+        villageId = villageId
     )
 }
 
 /**
- * Mapper from UserDto to Domain User model.
+ * Mapper from UserDto to Domain Model User.
  */
 fun UserDto.toDomain(): User {
-    val nameParts = (fullName ?: "").trim().split(" ", limit = 2)
-    val fName = nameParts.getOrNull(0) ?: ""
-    val lName = nameParts.getOrNull(1) ?: ""
+    val fName = firstName ?: ""
+    val lName = lastName ?: ""
 
     return User(
-        serverId = id?.toString() ?: firebaseUid,
+        serverId = id,
         firstName = fName,
         lastName = lName,
         phone = phoneNumber ?: "",
         lastLogin = updatedAt,
         dateJoined = createdAt,
         role = role ?: "user",
-        profileImage = profileImage
+        profileImage = profileImage,
+        villageId = villageId
     )
 }
