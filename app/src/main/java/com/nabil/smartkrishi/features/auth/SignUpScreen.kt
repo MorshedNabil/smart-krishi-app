@@ -331,8 +331,8 @@ fun SignUpScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val divisionsList = if (uiState.divisions.isNotEmpty()) uiState.divisions else listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh")
-    val districtsList = if (uiState.districts.isNotEmpty()) uiState.districts else listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh")
+    val divisionsList = if (uiState.divisions.isNotEmpty()) uiState.divisions else listOf("Select Division")
+    val districtsList = if (uiState.districts.isNotEmpty()) uiState.districts else listOf("Select District")
 
     SignUpContent(
         modifier = modifier,
@@ -347,7 +347,7 @@ fun SignUpScreen(
         onVillageChange = viewModel::updateVillage,
         onRoleSelected = viewModel::updateRole,
         onSignUpClick = {
-            if (viewModel.validateAndSignUp()) {
+            viewModel.registerUser {
                 onSignUpClick(viewModel.uiState.value.formData)
             }
         }

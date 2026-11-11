@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.nabil.smartkrishi.data.local.AppDatabase
 import com.nabil.smartkrishi.data.repository.LocationRepository
+import com.nabil.smartkrishi.data.repository.UserRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +25,11 @@ class SignUpViewModel(
     private val locationRepository: LocationRepository by lazy {
         LocationRepository(
             locationDao = AppDatabase.getInstance(application).locationDao()
+        )
+    }
+    private val userRepository: UserRepository by lazy {
+        UserRepository(
+            userDao = AppDatabase.getInstance(application).userDao()
         )
     }
 
@@ -158,15 +164,49 @@ class SignUpViewModel(
             return false
         }
 
-        _uiState.update {
-            it.copy(
-                isLoading = true,
-                errorMessage = null,
-                isSignUpSuccess = true
+        return true
+    }
+
+    fun registerUser(onSuccess: () -> Unit = {}) {
+        val formData = _uiState.value.formData
+
+        if (!validateAndSignUp()) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            val result = userRepository.registerUser(
+                firstName = formData.firstName,
+                lastName = formData.lastName,
+                phone = formData.phone,
+                division = formData.division,
+                district = formData.district,
+                villageName = formData.villageName,
+                role = formData.role
+            )
+
+            result.fold(
+                onSuccess = { _ ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isSignUpSuccess = true,
+                            errorMessage = null
+                        )
+                    }
+                    onSuccess()
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isSignUpSuccess = false,
+                            errorMessage = error.localizedMessage ?: "Registration failed. Please try again."
+                        )
+                    }
+                }
             )
         }
-
-        return true
     }
 
     fun clearErrorMessage() {

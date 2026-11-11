@@ -1,6 +1,11 @@
 package com.nabil.smartkrishi.features.auth
 
 import android.app.Application
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -11,14 +16,21 @@ import org.junit.Test
 /**
  * Unit Test for [SignUpViewModel].
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class SignUpViewModelTest {
 
     private lateinit var viewModel: SignUpViewModel
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(Dispatchers.Unconfined)
         val application = Application()
         viewModel = SignUpViewModel(application)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -87,7 +99,6 @@ class SignUpViewModelTest {
         val isValid = viewModel.validateAndSignUp()
 
         assertTrue(isValid)
-        assertTrue(viewModel.uiState.value.isLoading)
         assertNull(viewModel.uiState.value.errorMessage)
         assertEquals("John", viewModel.uiState.value.formData.firstName)
         assertEquals("Doe", viewModel.uiState.value.formData.lastName)

@@ -2,9 +2,12 @@ package com.nabil.smartkrishi.data.remote
 
 import com.nabil.smartkrishi.data.remote.dto.DivisionDto
 import com.nabil.smartkrishi.data.remote.dto.MarketPriceDto
+import com.nabil.smartkrishi.data.remote.dto.SignUpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.UserResponseDto
 import com.nabil.smartkrishi.data.remote.dto.WeatherResponseDto
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface ApiService {
@@ -26,4 +29,8 @@ interface ApiService {
     // API for fetching current authenticated user profile
     @GET("auth/accounts/me/")
     suspend fun getUserProfile(): UserResponseDto
+
+    // API for registering new user account
+    @POST("auth/accounts/register/")
+    suspend fun registerUser(@Body request: SignUpRequestDto): UserResponseDto
 }

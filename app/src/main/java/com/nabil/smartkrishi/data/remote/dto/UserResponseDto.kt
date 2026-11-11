@@ -47,6 +47,7 @@ data class UserDto(
     val updatedAt: String?
 )
 
+
 /**
  * Mapper from UserDto to UserEntity.
  */
