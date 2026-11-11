@@ -7,9 +7,11 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.nabil.smartkrishi.data.local.converters.WeatherConverters
 import com.nabil.smartkrishi.data.local.dao.LocationDao
+import com.nabil.smartkrishi.data.local.dao.UserDao
 import com.nabil.smartkrishi.data.local.dao.WeatherDao
 import com.nabil.smartkrishi.data.local.entity.DistrictEntity
 import com.nabil.smartkrishi.data.local.entity.DivisionEntity
+import com.nabil.smartkrishi.data.local.entity.UserEntity
 import com.nabil.smartkrishi.data.local.entity.VillageEntity
 import com.nabil.smartkrishi.data.local.entity.WeatherEntity
 
@@ -21,9 +23,10 @@ import com.nabil.smartkrishi.data.local.entity.WeatherEntity
         WeatherEntity::class,
         DivisionEntity::class,
         DistrictEntity::class,
-        VillageEntity::class
+        VillageEntity::class,
+        UserEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(WeatherConverters::class)
@@ -31,6 +34,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun weatherDao(): WeatherDao
     abstract fun locationDao(): LocationDao
+    abstract fun userDao(): UserDao
 
     companion object {
         @Volatile
