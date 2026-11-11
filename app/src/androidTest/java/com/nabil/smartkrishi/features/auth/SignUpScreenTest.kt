@@ -41,7 +41,6 @@ class SignUpScreenTest {
         composeTestRule.onNodeWithText("First Name").assertIsDisplayed()
         composeTestRule.onNodeWithText("Last Name").assertIsDisplayed()
         composeTestRule.onNodeWithText("Phone").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Nid").assertIsDisplayed()
         composeTestRule.onNodeWithText("Division").assertIsDisplayed()
         composeTestRule.onNodeWithText("District").assertIsDisplayed()
         composeTestRule.onNodeWithText("Village Name").assertIsDisplayed()
@@ -101,7 +100,6 @@ class SignUpScreenTest {
             firstName = "John",
             lastName = "Doe",
             phone = "1712345678",
-            nidNumber = "1234567890",
             division = "Dhaka",
             district = "Chittagong",
             villageName = "Rahitpur",
@@ -129,10 +127,9 @@ class SignUpScreenTest {
         assertEquals("John", submittedData?.firstName)
         assertEquals("Doe", submittedData?.lastName)
         assertEquals("1712345678", submittedData?.phone)
-        assertEquals("1234567890", submittedData?.nidNumber)
         assertEquals("Dhaka", submittedData?.division)
         assertEquals("Chittagong", submittedData?.district)
-        assertEquals("Rahitpur", submittedData?.villageName)
+        assertEquals("Rahitport", submittedData?.villageName)
         assertEquals("Vendor", submittedData?.role)
     }
 }

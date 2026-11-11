@@ -15,7 +15,6 @@ class SignUpFormDataTest {
         assertEquals("", formData.firstName)
         assertEquals("", formData.lastName)
         assertEquals("", formData.phone)
-        assertEquals("", formData.nidNumber)
         assertEquals("", formData.division)
         assertEquals("", formData.district)
         assertEquals("", formData.villageName)
@@ -28,7 +27,6 @@ class SignUpFormDataTest {
             firstName = "John",
             lastName = "Doe",
             phone = "1712345678",
-            nidNumber = "9876543210",
             division = "Rangpur",
             district = "Panchagarh",
             villageName = "Rahitpur",
@@ -38,7 +36,6 @@ class SignUpFormDataTest {
         assertEquals("John", formData.firstName)
         assertEquals("Doe", formData.lastName)
         assertEquals("1712345678", formData.phone)
-        assertEquals("9876543210", formData.nidNumber)
         assertEquals("Rangpur", formData.division)
         assertEquals("Panchagarh", formData.district)
         assertEquals("Rahitpur", formData.villageName)

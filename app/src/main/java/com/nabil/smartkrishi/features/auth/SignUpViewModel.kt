@@ -81,15 +81,6 @@ class SignUpViewModel(
         }
     }
 
-    fun updateNid(nidNumber: String) {
-        _uiState.update {
-            it.copy(
-                formData = it.formData.copy(nidNumber = nidNumber),
-                errorMessage = null
-            )
-        }
-    }
-
     fun updateDivision(division: String) {
         // Update selected division and reset selected district
         _uiState.update {
@@ -152,10 +143,6 @@ class SignUpViewModel(
         }
         if (formData.phone.isBlank()) {
             _uiState.update { it.copy(errorMessage = "Please enter Phone Number") }
-            return false
-        }
-        if (formData.nidNumber.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Please enter NID number") }
             return false
         }
         if (formData.division.isBlank()) {

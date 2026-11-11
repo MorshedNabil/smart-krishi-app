@@ -42,8 +42,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
@@ -342,7 +342,6 @@ fun SignUpScreen(
         onFirstNameChange = viewModel::updateFirstName,
         onLastNameChange = viewModel::updateLastName,
         onPhoneChange = viewModel::updatePhone,
-        onNidChange = viewModel::updateNid,
         onDivisionSelected = viewModel::updateDivision,
         onDistrictSelected = viewModel::updateDistrict,
         onVillageChange = viewModel::updateVillage,
@@ -367,7 +366,6 @@ fun SignUpContent(
     onFirstNameChange: (String) -> Unit = {},
     onLastNameChange: (String) -> Unit = {},
     onPhoneChange: (String) -> Unit = {},
-    onNidChange: (String) -> Unit = {},
     onDivisionSelected: (String) -> Unit = {},
     onDistrictSelected: (String) -> Unit = {},
     onVillageChange: (String) -> Unit = {},
@@ -436,15 +434,6 @@ fun SignUpContent(
                 PhoneInputField(
                     phoneValue = formData.phone,
                     onPhoneChange = onPhoneChange
-                )
-
-                // NID Field
-                FormLabel(text = "Nid")
-                FormTextField(
-                    value = formData.nidNumber,
-                    onValueChange = onNidChange,
-                    hint = "Enter NID number",
-                    keyboardType = KeyboardType.Number
                 )
 
                 // Division Dropdown Field
