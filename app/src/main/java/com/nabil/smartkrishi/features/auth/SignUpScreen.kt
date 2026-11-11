@@ -20,9 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
@@ -45,7 +42,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -339,6 +339,8 @@ fun SignUpScreen(
         uiState = uiState,
         divisions = divisionsList,
         districts = districtsList,
+        onFirstNameChange = viewModel::updateFirstName,
+        onLastNameChange = viewModel::updateLastName,
         onPhoneChange = viewModel::updatePhone,
         onNidChange = viewModel::updateNid,
         onDivisionSelected = viewModel::updateDivision,
@@ -362,6 +364,8 @@ fun SignUpContent(
     modifier: Modifier = Modifier,
     divisions: List<String> = listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh"),
     districts: List<String> = listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh"),
+    onFirstNameChange: (String) -> Unit = {},
+    onLastNameChange: (String) -> Unit = {},
     onPhoneChange: (String) -> Unit = {},
     onNidChange: (String) -> Unit = {},
     onDivisionSelected: (String) -> Unit = {},
@@ -409,6 +413,22 @@ fun SignUpContent(
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                // First Name Field
+                FormLabel(text = "First Name")
+                FormTextField(
+                    value = formData.firstName,
+                    onValueChange = onFirstNameChange,
+                    hint = "Enter first name"
+                )
+
+                // Last Name Field
+                FormLabel(text = "Last Name")
+                FormTextField(
+                    value = formData.lastName,
+                    onValueChange = onLastNameChange,
+                    hint = "Enter last name"
                 )
 
                 // Phone Field

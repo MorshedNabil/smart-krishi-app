@@ -4,6 +4,8 @@ package com.nabil.smartkrishi.features.auth
  * Data class representing the SignUp form field data.
  */
 data class SignUpFormData(
+    val firstName: String = "",
+    val lastName: String = "",
     val phone: String = "",
     val nidNumber: String = "",
     val division: String = "",

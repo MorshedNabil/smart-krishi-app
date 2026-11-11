@@ -38,6 +38,8 @@ class SignUpScreenTest {
         composeTestRule.onAllNodesWithText("Sign up").assertCountEquals(2)
 
         // Verify Form Labels
+        composeTestRule.onNodeWithText("First Name").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Last Name").assertIsDisplayed()
         composeTestRule.onNodeWithText("Phone").assertIsDisplayed()
         composeTestRule.onNodeWithText("Nid").assertIsDisplayed()
         composeTestRule.onNodeWithText("Division").assertIsDisplayed()
@@ -96,6 +98,8 @@ class SignUpScreenTest {
         var submittedData: SignUpFormData? = null
 
         val testFormData = SignUpFormData(
+            firstName = "John",
+            lastName = "Doe",
             phone = "1712345678",
             nidNumber = "1234567890",
             division = "Dhaka",
@@ -122,6 +126,8 @@ class SignUpScreenTest {
 
         // Verify Submitted Form Data
         assertNotNull("Submitted form data should not be null", submittedData)
+        assertEquals("John", submittedData?.firstName)
+        assertEquals("Doe", submittedData?.lastName)
         assertEquals("1712345678", submittedData?.phone)
         assertEquals("1234567890", submittedData?.nidNumber)
         assertEquals("Dhaka", submittedData?.division)

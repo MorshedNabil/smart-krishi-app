@@ -25,6 +25,8 @@ class SignUpViewModelTest {
     fun initialState_hasDefaultFormData() {
         val state = viewModel.uiState.value
 
+        assertEquals("", state.formData.firstName)
+        assertEquals("", state.formData.lastName)
         assertEquals("", state.formData.phone)
         assertEquals("", state.formData.nidNumber)
         assertEquals("", state.formData.division)
@@ -37,12 +39,24 @@ class SignUpViewModelTest {
 
     @Test
     fun validateAndSignUp_whenFieldsAreBlank_returnsFalseAndSetsErrorMessage() {
-        // Phone is blank
+        // First Name is blank
+        val isFirstNameValid = viewModel.validateAndSignUp()
+        assertFalse(isFirstNameValid)
+        assertEquals("Please enter First Name", viewModel.uiState.value.errorMessage)
+
+        // Fill First Name, Last Name is blank
+        viewModel.updateFirstName("John")
+        val isLastNameValid = viewModel.validateAndSignUp()
+        assertFalse(isLastNameValid)
+        assertEquals("Please enter Last Name", viewModel.uiState.value.errorMessage)
+
+        // Fill Last Name, Phone is blank
+        viewModel.updateLastName("Doe")
         val isPhoneValid = viewModel.validateAndSignUp()
         assertFalse(isPhoneValid)
         assertEquals("Please enter Phone Number", viewModel.uiState.value.errorMessage)
 
-        // Fill phone, NID is blank
+        // Fill Phone, NID is blank
         viewModel.updatePhone("1712345678")
         val isNidValid = viewModel.validateAndSignUp()
         assertFalse(isNidValid)
@@ -69,6 +83,8 @@ class SignUpViewModelTest {
 
     @Test
     fun validateAndSignUp_whenAllFieldsAreFilled_returnsTrue() {
+        viewModel.updateFirstName("John")
+        viewModel.updateLastName("Doe")
         viewModel.updatePhone("1712345678")
         viewModel.updateNid("1234567890")
         viewModel.updateDivision("Dhaka")
@@ -81,6 +97,8 @@ class SignUpViewModelTest {
         assertTrue(isValid)
         assertTrue(viewModel.uiState.value.isLoading)
         assertNull(viewModel.uiState.value.errorMessage)
+        assertEquals("John", viewModel.uiState.value.formData.firstName)
+        assertEquals("Doe", viewModel.uiState.value.formData.lastName)
         assertEquals("1712345678", viewModel.uiState.value.formData.phone)
         assertEquals("1234567890", viewModel.uiState.value.formData.nidNumber)
         assertEquals("Dhaka", viewModel.uiState.value.formData.division)

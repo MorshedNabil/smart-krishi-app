@@ -15,11 +15,7 @@ data class User(
     val dateJoined: String? = null,
     val role: String,
     val profileImage: String? = null
-) {
-    val fullName: String
-        get() = "$firstName $lastName".trim()
-}
-
+)
 /**
  * Mapper function to convert Domain User model to UserEntity.
  */
