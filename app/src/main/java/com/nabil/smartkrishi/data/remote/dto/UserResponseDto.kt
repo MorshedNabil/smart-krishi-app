@@ -19,9 +19,6 @@ data class UserDto(
     @SerialName("id")
     val id: Int?,
 
-    @SerialName("firebase_uid")
-    val firebaseUid: String?,
-
     @SerialName("phone_number")
     val phoneNumber: String?,
 

@@ -105,7 +105,6 @@ class FakeApiService : ApiService {
         return UserResponseDto(
             user = UserDto(
                 id = 1,
-                firebaseUid = "fb-uid-123",
                 phoneNumber = request.phoneNumber,
                 firstName = request.firstName,
                 lastName = request.lastName,
