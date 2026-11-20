@@ -11,27 +11,17 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.PhoneAuthCredential;
-import com.google.firebase.auth.PhoneAuthOptions;
-import com.google.firebase.auth.PhoneAuthProvider;
+import com.nabil.smartkrishi.data.local.AppDatabase;
+import com.nabil.smartkrishi.data.remote.RetrofitClient;
+import com.nabil.smartkrishi.data.repository.UserRepository;
+import com.nabil.smartkrishi.domain.model.User;
 
 public class OtpVerification extends AppCompatActivity {
 
     EditText otp1, otp2, otp3, otp4, otp5, otp6;
     Button loginBtn;
-    private FirebaseAuth fAuth;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,76 +36,46 @@ public class OtpVerification extends AppCompatActivity {
         otp5 = findViewById(R.id.otp5);
         otp6 = findViewById(R.id.otp6);
         loginBtn = findViewById(R.id.btnLogin);
-        fAuth = FirebaseAuth.getInstance();
-
-        String myOtp = getIntent().getStringExtra("verification_pin");
 
         // =================== Add text change listener in each edit text field ============================
-        // The cursor will automatically move to the next field when a number is entered
         otp1.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                 if(s.length() == 1){
                     otp2.requestFocus();
                 }
-
             }
         });
 
         otp2.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                 if(s.length() == 1){
                     otp3.requestFocus();
-                }
-                else if(s.length() == 0){
-                    // when user removing the number from the field go to the previous field
+                } else if(s.length() == 0){
                     otp1.requestFocus();
-
                 }
-
             }
         });
 
         otp3.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                 if(s.length() == 1){
                     otp4.requestFocus();
-                    //Log.d("UserOtp", OTP + "");
-                }
-                else if(s.length() == 0){
-                    // when user removing the number from the field go to the previous field
+                } else if(s.length() == 0){
                     otp2.requestFocus();
                 }
             }
@@ -123,22 +83,14 @@ public class OtpVerification extends AppCompatActivity {
 
         otp4.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                 if(s.length() == 1){
                     otp5.requestFocus();
-                }
-                else if(s.length() == 0){
-                    // when user removing the number from the field go to the previous field
+                } else if(s.length() == 0){
                     otp3.requestFocus();
                 }
             }
@@ -146,22 +98,14 @@ public class OtpVerification extends AppCompatActivity {
 
         otp5.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                 if(s.length() == 1){
                     otp6.requestFocus();
-                }
-                else if(s.length() == 0){
-                    // when user removing the number from the field go to the previous field
+                } else if(s.length() == 0){
                     otp4.requestFocus();
                 }
             }
@@ -169,19 +113,12 @@ public class OtpVerification extends AppCompatActivity {
 
         otp6.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                  if(s.length() == 0){
-                     // when user removing the number from the field go to the previous field
                     otp5.requestFocus();
                  }
             }
@@ -191,46 +128,52 @@ public class OtpVerification extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(!otp6.getText().toString().isEmpty()){
-                    String OTP = "";
-                    OTP = otp1.getText().toString() + otp2.getText().toString() + otp3.getText().toString() + otp4.getText().toString() + otp5.getText().toString() + otp6.getText().toString();
-
-                    // OTP matching code
-                    if(!OTP.isEmpty()){
-                        assert myOtp != null;
-                        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(myOtp, OTP);
-                        logIn(credential);
-                    }
-                    else{
+                    String otpCode = otp1.getText().toString() + otp2.getText().toString() + otp3.getText().toString() + otp4.getText().toString() + otp5.getText().toString() + otp6.getText().toString();
+                    if(!otpCode.isEmpty()){
+                        verifyAndProceed();
+                    } else {
                         Toast.makeText(OtpVerification.this, "Please enter OTP", Toast.LENGTH_SHORT).show();
                     }
+                } else {
+                    Toast.makeText(OtpVerification.this, "Please enter complete OTP", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
-    // =========== onStart() uses when user is logged in previously =====================
-    @Override
-    public void onStart() {
-        super.onStart();
-        FirebaseUser currentUser = fAuth.getCurrentUser();
-        if(currentUser != null){
-            sendToMain(); // if user is logged in then directly go to Home screen;
+    private void verifyAndProceed() {
+        boolean isSignup = getIntent().getBooleanExtra("is_signup", false);
+        if (isSignup) {
+            String firstName = getIntent().getStringExtra("first_name");
+            String lastName = getIntent().getStringExtra("last_name");
+            String phone = getIntent().getStringExtra("phone");
+            String role = getIntent().getStringExtra("role");
+            int villageId = getIntent().getIntExtra("village_id", 1);
+
+            UserRepository userRepository =
+                new UserRepository(
+                    AppDatabase.Companion.getInstance(getApplicationContext()).userDao(),
+                    RetrofitClient.INSTANCE.getApiService()
+                );
+
+            new Thread(() -> {
+                try {
+                    User user = userRepository.registerUserSync(
+                        firstName, lastName, phone, role, villageId, null
+                    );
+                    if (user != null) {
+                        runOnUiThread(() -> sendToMain());
+                    } else {
+                        runOnUiThread(() -> Toast.makeText(OtpVerification.this, "Registration failed. Please check your details or connection.", Toast.LENGTH_LONG).show());
+                    }
+                } catch (Exception e) {
+                    Log.e("OtpVerification", "Registration API request failed", e);
+                    runOnUiThread(() -> Toast.makeText(OtpVerification.this, "Registration failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                }
+            }).start();
+        } else {
+            sendToMain();
         }
-
-    }
-    private void logIn(PhoneAuthCredential credential) {
-        fAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    sendToMain();
-                }
-                else{
-                    Toast.makeText(OtpVerification.this, "Something went wrong", Toast.LENGTH_SHORT).show();
-                    Log.d("Verification Error", "onComplete: " + task.getException().getMessage());
-                }
-            }
-        });
     }
 
     private void sendToMain() {
@@ -238,6 +181,4 @@ public class OtpVerification extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-
-
 }

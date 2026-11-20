@@ -39,10 +39,8 @@ class UserRepositoryTest {
             firstName = "John",
             lastName = "Doe",
             phone = "01712345678",
-            division = "Dhaka",
-            district = "Dhaka",
-            villageName = "Rahitpur",
-            role = "Farmer"
+            role = "Farmer",
+            villageId = 10
         )
 
         assertTrue(result.isSuccess)

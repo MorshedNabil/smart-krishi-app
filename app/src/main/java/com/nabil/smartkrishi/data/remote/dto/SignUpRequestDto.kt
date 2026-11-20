@@ -18,14 +18,11 @@ data class SignUpRequestDto(
     val phoneNumber: String,
 
     @SerialName("role")
-    val role: String,
+    val role: String? = "farmer",
 
-    @SerialName("division")
-    val division: String,
+    @SerialName("profile_image")
+    val profileImage: String? = null,
 
-    @SerialName("district")
-    val district: String,
-
-    @SerialName("village_name")
-    val villageName: String
+    @SerialName("village_id")
+    val villageId: Int? = null
 )

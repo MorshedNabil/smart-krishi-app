@@ -11,6 +11,7 @@ import com.nabil.smartkrishi.data.remote.dto.toEntity
 import com.nabil.smartkrishi.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 
 /**
  * Repository acting as Single Source of Truth (SSOT) for User data.
@@ -19,7 +20,9 @@ class UserRepository(
     private val userDao: UserDao,
     private val apiService: ApiService = RetrofitClient.apiService
 ) {
-
+    /*
+     * Custom functions for logging in unit test environments.
+     */
     private fun safeLogD(message: String) {
         try {
             Log.d("UserRepository", message)
@@ -72,10 +75,9 @@ class UserRepository(
         firstName: String,
         lastName: String,
         phone: String,
-        division: String,
-        district: String,
-        villageName: String,
-        role: String
+        role: String,
+        villageId: Int,
+        profileImage: String? = null
     ): Result<User> {
         return runCatching {
             safeLogD("Registering user with phone: $phone")
@@ -84,10 +86,10 @@ class UserRepository(
                 lastName = lastName,
                 phoneNumber = phone,
                 role = role.lowercase(),
-                division = division,
-                district = district,
-                villageName = villageName
+                profileImage = profileImage,
+                villageId = villageId
             )
+            safeLogD("Sending registration request: $requestDto")
             val response = apiService.registerUser(requestDto)
             val userDto = response.user ?: throw Exception("User object is null in registration response")
 
@@ -100,5 +102,19 @@ class UserRepository(
         }.onFailure { exception ->
             safeLogE("Failed to register user", exception)
         }
+    }
+
+    /**
+     * Synchronous blocking wrapper for registerUser, useful for Java interoperability (e.g. OtpVerification).
+     */
+    fun registerUserSync(
+        firstName: String,
+        lastName: String,
+        phone: String,
+        role: String,
+        villageId: Int,
+        profileImage: String? = null
+    ): User? = runBlocking {
+        registerUser(firstName, lastName, phone, role, villageId, profileImage).getOrNull()
     }
 }

@@ -396,12 +396,44 @@ fun SaveChangeButton(
     }
 }
 
+@Composable
+fun LogoutButton(
+    modifier: Modifier = Modifier,
+    onLogoutClick: () -> Unit
+) {
+    // --- Log Out Button ---
+    Button(
+        onClick = onLogoutClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        shape = CircleShape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFFD9534F),
+            contentColor = Color.White
+        ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 4.dp,
+            pressedElevation = 8.dp
+        )
+    ) {
+        Text(
+            text = "Log Out",
+            style = TextStyle(
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+    }
+}
+
 // Stateful ProfileScreen: It holds and controls all the state of the screen
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel = viewModel(),
     onSaveClick: (ProfileUiState) -> Unit = {},
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onLogoutClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -415,7 +447,8 @@ fun ProfileScreen(
         onSaveClick = {
             onSaveClick(uiState)
         } ,
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        onLogoutClick = onLogoutClick
     )
 }
 
@@ -429,7 +462,8 @@ fun ProfileContent(
     onProfileImageChange: (Uri) -> Unit,
     onToggleDropdown: (Boolean) -> Unit,
     onSaveClick: () -> Unit,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onLogoutClick: () -> Unit = {}
 ) {
     val locations = remember {
         listOf(
@@ -495,13 +529,22 @@ fun ProfileContent(
                 locations = locations
             )
 
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             // Save Changes Button
             SaveChangeButton(
                 onSaveClick = {
-                    onSaveClick() // callback function to save changes. This function will not take any parameters because it doesn't need to know about the state of the screen
+                    onSaveClick()
                 },
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Logout Button
+            LogoutButton(
+                onLogoutClick = {
+                    onLogoutClick()
+                }
             )
 
             Spacer(modifier = Modifier.height(24.dp))

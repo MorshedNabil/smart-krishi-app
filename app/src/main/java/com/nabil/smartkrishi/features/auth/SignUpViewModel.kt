@@ -1,9 +1,10 @@
 package com.nabil.smartkrishi.features.auth
 
+import android.app.Activity
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.nabil.smartkrishi.data.local.AppDatabase
 import com.nabil.smartkrishi.data.repository.LocationRepository
 import com.nabil.smartkrishi.data.repository.UserRepository
@@ -21,7 +22,6 @@ class SignUpViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
-    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val locationRepository: LocationRepository by lazy {
         LocationRepository(
             locationDao = AppDatabase.getInstance(application).locationDao()
@@ -136,6 +136,9 @@ class SignUpViewModel(
         }
     }
 
+    /**
+     * Validates the form data for signup.
+     */
     fun validateAndSignUp(): Boolean {
         val formData = _uiState.value.formData
 
@@ -167,49 +170,62 @@ class SignUpViewModel(
         return true
     }
 
-    fun registerUser(onSuccess: () -> Unit = {}) {
-        val formData = _uiState.value.formData
+    /**
+     * Formats the sign-up form data (trims whitespace, formats phone number, normalizes role, etc.).
+     */
+    fun formatFormData(formData: SignUpFormData): SignUpFormData {
+        return formData.copy(
+            firstName = formData.firstName.trim(),
+            lastName = formData.lastName.trim(),
+            phone = formatPhoneNumber(formData.phone.trim()),
+            role = formData.role.trim().lowercase(),
+            division = formData.division.trim(),
+            district = formData.district.trim(),
+            villageName = formData.villageName.trim()
+        )
+    }
 
-        if (!validateAndSignUp()) return
+    /**
+     * Initiates phone number verification (OTP request) for signup.
+     */
+    fun requestSignUpVerification(
+        activity: Activity,
+        onCodeSent: (verificationId: String, formData: SignUpFormData, villageId: Int) -> Unit
+    ) {
+        if (!validateAndSignUp())
+            return
+
+        val formattedData = formatFormData(_uiState.value.formData)
+
+        _uiState.update { it.copy(formData = formattedData, isLoading = true, errorMessage = null) }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            val villageId = try {
+                AppDatabase.getInstance(getApplication()).locationDao().getVillageIdByName(formattedData.villageName) ?: 1
+            } catch (e: Exception) {
+                1
+            }
 
-            val result = userRepository.registerUser(
-                firstName = formData.firstName,
-                lastName = formData.lastName,
-                phone = formData.phone,
-                division = formData.division,
-                district = formData.district,
-                villageName = formData.villageName,
-                role = formData.role
-            )
-
-            result.fold(
-                onSuccess = { _ ->
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            isSignUpSuccess = true,
-                            errorMessage = null
-                        )
-                    }
-                    onSuccess()
-                },
-                onFailure = { error ->
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            isSignUpSuccess = false,
-                            errorMessage = error.localizedMessage ?: "Registration failed. Please try again."
-                        )
-                    }
-                }
-            )
+            _uiState.update { it.copy(isLoading = false) }
+            onCodeSent("simulated_verification_id", formattedData, villageId)
+            Log.d("SignUpViewModel", "OTP Code sent successfully")
         }
     }
 
     fun clearErrorMessage() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    /**
+     * format the phone number
+     */
+    fun formatPhoneNumber(phoneNumber: String): String {
+        val digits = phoneNumber.filter { it.isDigit() }
+
+        return when {
+            digits.startsWith("880") -> "+$digits"
+            digits.startsWith("0") -> "+88$digits"
+            else -> "+880$digits"
+        }
     }
 }

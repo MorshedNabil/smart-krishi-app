@@ -1,5 +1,6 @@
 package com.nabil.smartkrishi.features.auth
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -42,6 +44,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
@@ -295,28 +298,41 @@ fun RoleSelectionGroup(
 }
 
 /**
- * SignUp Action Button.
+ * SignUp Action Button with loading indicator support.
  */
 @Composable
 fun SignUpButton(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false
 ) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = ButtonBgColor),
+        enabled = !isLoading,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = ButtonBgColor,
+            disabledContainerColor = ButtonBgColor.copy(alpha = 0.7f)
+        ),
         shape = RoundedCornerShape(28.dp),
         modifier = modifier
             .testTag("btn_signup")
             .width(180.dp)
             .height(55.dp)
     ) {
-        Text(
-            text = "Sign up",
-            color = Color.White,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
+        if (isLoading) {
+            CircularProgressIndicator(
+                color = Color.White,
+                strokeWidth = 3.dp,
+                modifier = Modifier.size(24.dp)
+            )
+        } else {
+            Text(
+                text = "Sign up",
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
@@ -327,12 +343,13 @@ fun SignUpButton(
 fun SignUpScreen(
     modifier: Modifier = Modifier,
     viewModel: SignUpViewModel = viewModel(),
-    onSignUpClick: (SignUpFormData) -> Unit = {}
+    onOtpRequested: (verificationId: String, formData: SignUpFormData, villageId: Int) -> Unit = { _, _, _ -> }
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val divisionsList = if (uiState.divisions.isNotEmpty()) uiState.divisions else listOf("Select Division")
-    val districtsList = if (uiState.districts.isNotEmpty()) uiState.districts else listOf("Select District")
+    val divisionsList = if (uiState.divisions.isNotEmpty()) uiState.divisions else emptyList()
+    val districtsList = if (uiState.districts.isNotEmpty()) uiState.districts else emptyList()
 
     SignUpContent(
         modifier = modifier,
@@ -347,8 +364,8 @@ fun SignUpScreen(
         onVillageChange = viewModel::updateVillage,
         onRoleSelected = viewModel::updateRole,
         onSignUpClick = {
-            viewModel.registerUser {
-                onSignUpClick(viewModel.uiState.value.formData)
+            viewModel.requestSignUpVerification(context as Activity) { verificationId, formData, villageId ->
+                onOtpRequested(verificationId, formData, villageId)
             }
         }
     )
@@ -361,8 +378,8 @@ fun SignUpScreen(
 fun SignUpContent(
     uiState: SignUpUIState,
     modifier: Modifier = Modifier,
-    divisions: List<String> = listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh"),
-    districts: List<String> = listOf("Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal", "Sylhet", "Rangpur", "Mymensingh"),
+    divisions: List<String> = emptyList(),
+    districts: List<String> = emptyList(),
     onFirstNameChange: (String) -> Unit = {},
     onLastNameChange: (String) -> Unit = {},
     onPhoneChange: (String) -> Unit = {},
@@ -477,7 +494,8 @@ fun SignUpContent(
                     contentAlignment = Alignment.Center
                 ) {
                     SignUpButton(
-                        onClick = onSignUpClick
+                        onClick = onSignUpClick,
+                        isLoading = uiState.isLoading
                     )
                 }
 

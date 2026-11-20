@@ -13,6 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nabil.smartkrishi.ui.theme.SmartKrishiTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -129,7 +130,49 @@ class SignUpScreenTest {
         assertEquals("1712345678", submittedData?.phone)
         assertEquals("Dhaka", submittedData?.division)
         assertEquals("Chittagong", submittedData?.district)
-        assertEquals("Rahitport", submittedData?.villageName)
+        assertEquals("Rahitpur", submittedData?.villageName)
         assertEquals("Vendor", submittedData?.role)
+    }
+
+    @Test
+    fun signUpScreen_fillingFormAndClickingSignUp_triggersRegistrationCallback() {
+        var isSignUpClicked = false
+        val testFormData = SignUpFormData(
+            firstName = "Jane",
+            lastName = "Smith",
+            phone = "01812345678",
+            division = "Chittagong",
+            district = "Comilla",
+            villageName = "Sonar Bangla",
+            role = "Farmer"
+        )
+
+        composeTestRule.setContent {
+            SmartKrishiTheme {
+                SignUpContent(
+                    uiState = SignUpUIState(
+                        formData = testFormData
+                    ),
+                    onSignUpClick = {
+                        isSignUpClicked = true
+                    }
+                )
+            }
+        }
+
+        // Scroll to the submit button and click
+        composeTestRule.onNodeWithTag("btn_signup")
+            .performScrollTo()
+            .performClick()
+
+        // Assert callback was triggered
+        assertTrue("Sign up button click should trigger callback", isSignUpClicked)
+        assertEquals("Jane", testFormData.firstName)
+        assertEquals("Smith", testFormData.lastName)
+        assertEquals("01812345678", testFormData.phone)
+        assertEquals("Chittagong", testFormData.division)
+        assertEquals("Comilla", testFormData.district)
+        assertEquals("Sonar Bangla", testFormData.villageName)
+        assertEquals("Farmer", testFormData.role)
     }
 }

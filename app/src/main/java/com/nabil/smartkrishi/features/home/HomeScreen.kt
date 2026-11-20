@@ -112,7 +112,7 @@ val farmerTools = listOf(
 @Composable
 fun HeaderSection(
     @DrawableRes drawable: Int,
-    @StringRes text: Int,
+    userName: String,
     date: String,
     modifier: Modifier = Modifier,
     onProfileClick: () -> Unit = {}
@@ -128,7 +128,7 @@ fun HeaderSection(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = "Hello " + stringResource(text),
+                text = "Hello $userName",
                 style = MaterialTheme.typography.displayMedium.copy(
                     fontSize = 25.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -930,10 +930,13 @@ fun HomeScreen(
         }
     }
 
+    val userName by viewModel.userNameState.collectAsStateWithLifecycle()
+
     HomeScreen(
         modifier = modifier,
         uiState = uiState,
         weatherState = weatherState,
+        userName = userName,
         date = dateState.date,
         isErrorDismissed = isErrorDismissed,
         bottomPadding = bottomPadding,
@@ -957,6 +960,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
     weatherState: WeatherUIState = WeatherUIState(),
+    userName: String = "User",
     date: String,
     isErrorDismissed: Boolean = false,
     bottomPadding: Dp = 0.dp,
@@ -990,7 +994,7 @@ fun HomeScreen(
             HeaderSection(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 drawable = R.drawable.farmer_dp,
-                text = R.string.user,
+                userName = userName,
                 date = date,
                 onProfileClick = onProfileClick // Forwards click event
             )
