@@ -5,6 +5,7 @@ import com.nabil.smartkrishi.data.local.entity.UserEntity
 import com.nabil.smartkrishi.data.remote.ApiService
 import com.nabil.smartkrishi.data.remote.dto.DivisionDto
 import com.nabil.smartkrishi.data.remote.dto.MarketPriceDto
+import com.nabil.smartkrishi.data.remote.dto.SendOtpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.SignUpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.UserDto
 import com.nabil.smartkrishi.data.remote.dto.UserResponseDto
@@ -115,5 +116,9 @@ class FakeApiService : ApiService {
                 updatedAt = "2026-03-30"
             )
         )
+    }
+
+    override suspend fun sendOtp(request: SendOtpRequestDto): retrofit2.Response<Unit> {
+        return retrofit2.Response.success(Unit)
     }
 }

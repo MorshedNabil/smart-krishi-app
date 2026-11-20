@@ -5,7 +5,10 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.nabil.smartkrishi.data.remote.RetrofitClient
+import com.nabil.smartkrishi.data.remote.dto.SendOtpRequestDto
 import com.nabil.smartkrishi.data.local.AppDatabase
+import com.nabil.smartkrishi.data.remote.RetrofitClient.apiService
 import com.nabil.smartkrishi.data.repository.LocationRepository
 import com.nabil.smartkrishi.data.repository.UserRepository
 import kotlinx.coroutines.Job
@@ -186,7 +189,7 @@ class SignUpViewModel(
     }
 
     /**
-     * Initiates phone number verification (OTP request) for signup.
+     * Initiates phone number verification (OTP request) for signup using backend /auth/accounts/send-otp/ API.
      */
     fun requestSignUpVerification(
         activity: Activity,
@@ -200,15 +203,27 @@ class SignUpViewModel(
         _uiState.update { it.copy(formData = formattedData, isLoading = true, errorMessage = null) }
 
         viewModelScope.launch {
-            val villageId = try {
-                AppDatabase.getInstance(getApplication()).locationDao().getVillageIdByName(formattedData.villageName) ?: 1
-            } catch (e: Exception) {
-                1
-            }
+            try {
+                // Retrieve the village ID from Room using village name
+                val villageId = try {
+                    AppDatabase.getInstance(getApplication()).locationDao().getVillageIdByName(formattedData.villageName) ?: 1
+                } catch (e: Exception) {
+                    1
+                }
 
-            _uiState.update { it.copy(isLoading = false) }
-            onCodeSent("simulated_verification_id", formattedData, villageId)
-            Log.d("SignUpViewModel", "OTP Code sent successfully")
+                val response = apiService.sendOtp(SendOtpRequestDto(phoneNumber = formattedData.phone))
+                _uiState.update { it.copy(isLoading = false) }
+
+                if (response.isSuccessful) {
+                    Log.d("SignUpViewModel", "OTP Code sent successfully via backend API")
+                    onCodeSent("otp_sent", formattedData, villageId)
+                } else {
+                    _uiState.update { it.copy(errorMessage = "Failed to send OTP. Please check the phone number.") }
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Failed to send OTP") }
+                Log.e("SignUpViewModel", "Send OTP failed", e)
+            }
         }
     }
 

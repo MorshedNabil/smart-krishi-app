@@ -2,14 +2,19 @@ package com.nabil.smartkrishi.data.remote
 
 import com.nabil.smartkrishi.data.remote.dto.DivisionDto
 import com.nabil.smartkrishi.data.remote.dto.MarketPriceDto
+import com.nabil.smartkrishi.data.remote.dto.SendOtpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.SignUpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.UserResponseDto
 import com.nabil.smartkrishi.data.remote.dto.WeatherResponseDto
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
+/**
+ *  This interface contains all the api services needed in the entire app
+ */
 interface ApiService {
     // API for weather data (supports lat/lon GPS coordinates or location query)
     @GET("api/weather/")
@@ -33,4 +38,8 @@ interface ApiService {
     // API for registering new user account
     @POST("auth/accounts/register/")
     suspend fun registerUser(@Body request: SignUpRequestDto): UserResponseDto
+
+    // API for sending OTP message
+    @POST("auth/accounts/send-otp/")
+    suspend fun sendOtp(@Body request: SendOtpRequestDto): Response<Unit>
 }
