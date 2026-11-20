@@ -1,11 +1,11 @@
 package com.nabil.smartkrishi.features.auth
 
-import android.app.Activity
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.nabil.smartkrishi.data.remote.RetrofitClient
-import com.nabil.smartkrishi.data.remote.dto.SendOtpRequestDto
+import com.nabil.smartkrishi.data.local.AppDatabase
+import com.nabil.smartkrishi.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,9 +13,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel managing Login state and input validations.
+ * ViewModel managing Login state, input validations, and authentication via POST /auth/accounts/login/.
  */
-class LoginViewModel : ViewModel() {
+class LoginViewModel(
+    application: Application
+) : AndroidViewModel(application) {
+
+    private val userRepository: UserRepository by lazy {
+        UserRepository(
+            userDao = AppDatabase.getInstance(application).userDao()
+        )
+    }
 
     private val _uiState = MutableStateFlow(LoginUIState())
     val uiState: StateFlow<LoginUIState> = _uiState.asStateFlow()
@@ -29,6 +37,15 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+    fun onPasswordChange(password: String) {
+        _uiState.update {
+            it.copy(
+                passwordInput = password,
+                errorMessage = null
+            )
+        }
+    }
+
     fun onLanguageToggle(isEnglish: Boolean) {
         _uiState.update { it.copy(isEnglish = isEnglish) }
     }
@@ -37,35 +54,51 @@ class LoginViewModel : ViewModel() {
         _uiState.update { it.copy(errorMessage = null) }
     }
 
-    fun requestPhoneVerification(
-        activity: Activity,
-        onCodeSent: (verificationId: String) -> Unit
-    ) {
+    /**
+     * Authenticates user via POST /auth/accounts/login/ with phone number and password (PIN).
+     */
+    fun loginUser(onLoginSuccess: () -> Unit) {
         val phone = _uiState.value.phoneInput.trim()
+        val password = _uiState.value.passwordInput.trim()
+
         if (phone.isEmpty()) {
             _uiState.update { it.copy(errorMessage = "Please enter phone number") }
             return
         }
+        if (password.length != 6 || !password.all { it.isDigit() }) {
+            _uiState.update { it.copy(errorMessage = "Please enter your valid 6-digit PIN") }
+            return
+        }
 
-        val formattedPhone = "+880$phone"
+        val formattedPhone = formatPhoneNumber(phone)
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
         viewModelScope.launch {
-            try {
-                val response = RetrofitClient.apiService.sendOtp(SendOtpRequestDto(phoneNumber = formattedPhone))
-                _uiState.update { it.copy(isLoading = false) }
+            val result = userRepository.loginUser(formattedPhone, password)
+            _uiState.update { it.copy(isLoading = false) }
 
-                if (response.isSuccessful) {
-                    _uiState.update { it.copy(verificationId = "otp_sent") }
-                    Log.d("LoginViewModel", "OTP Code sent successfully via backend API")
-                    onCodeSent("otp_sent")
-                } else {
-                    _uiState.update { it.copy(errorMessage = "Failed to send OTP. Please check the phone number.") }
-                }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Failed to send OTP") }
-                Log.e("LoginViewModel", "Send OTP failed", e)
+            if (result.isSuccess) {
+                _uiState.update { it.copy(isUserLoggedIn = true) }
+                Log.d("LoginViewModel", "Login successful")
+                onLoginSuccess()
+            } else {
+                val errorMsg = result.exceptionOrNull()?.localizedMessage ?: "Login failed. Please check your credentials."
+                _uiState.update { it.copy(errorMessage = errorMsg) }
+                Log.e("LoginViewModel", "Login failed", result.exceptionOrNull())
             }
+        }
+    }
+
+    /**
+     * format the phone number
+     */
+    fun formatPhoneNumber(phoneNumber: String): String {
+        val digits = phoneNumber.filter { it.isDigit() }
+
+        return when {
+            digits.startsWith("880") -> "+$digits"
+            digits.startsWith("0") -> "+88$digits"
+            else -> "+880$digits"
         }
     }
 }

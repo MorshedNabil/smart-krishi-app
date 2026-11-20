@@ -65,11 +65,10 @@ class MainActivity : ComponentActivity() {
                 ) {
                     composable("login") {
                         LoginScreen(
-                            onGetOtpClick = { verificationId ->
-                                val otpIntent = Intent(this@MainActivity, OtpVerification::class.java).apply {
-                                    putExtra("verification_pin", verificationId)
+                            onLoginSuccess = {
+                                navController.navigate("onboard") {
+                                    popUpTo("login") { inclusive = true }
                                 }
-                                startActivity(otpIntent)
                             },
                             onSignUpClick = {
                                 navController.navigate("signup")

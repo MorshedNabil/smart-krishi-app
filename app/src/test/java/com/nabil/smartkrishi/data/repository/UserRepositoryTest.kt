@@ -4,9 +4,12 @@ import com.nabil.smartkrishi.data.local.dao.UserDao
 import com.nabil.smartkrishi.data.local.entity.UserEntity
 import com.nabil.smartkrishi.data.remote.ApiService
 import com.nabil.smartkrishi.data.remote.dto.DivisionDto
+import com.nabil.smartkrishi.data.remote.dto.LoginRequestDto
+import com.nabil.smartkrishi.data.remote.dto.LoginResponseDto
 import com.nabil.smartkrishi.data.remote.dto.MarketPriceDto
 import com.nabil.smartkrishi.data.remote.dto.SendOtpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.SignUpRequestDto
+import com.nabil.smartkrishi.data.remote.dto.TokenDto
 import com.nabil.smartkrishi.data.remote.dto.UserDto
 import com.nabil.smartkrishi.data.remote.dto.UserResponseDto
 import com.nabil.smartkrishi.data.remote.dto.WeatherResponseDto
@@ -119,5 +122,23 @@ class FakeApiService : ApiService {
 
     override suspend fun sendOtp(request: SendOtpRequestDto): retrofit2.Response<Unit> {
         return retrofit2.Response.success(Unit)
+    }
+
+    override suspend fun loginUser(request: LoginRequestDto): LoginResponseDto {
+        return LoginResponseDto(
+            message = "Login successful.",
+            user = UserDto(
+                id = 1,
+                phoneNumber = request.phoneNumber,
+                firstName = "John",
+                lastName = "Doe",
+                role = "farmer",
+                profileImage = "https://example.com/img.jpg",
+                villageId = 10,
+                createdAt = "2026-03-30",
+                updatedAt = "2026-03-30"
+            ),
+            tokens = TokenDto(access = "access-token-123", refresh = "refresh-token-123")
+        )
     }
 }

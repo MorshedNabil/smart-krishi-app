@@ -2,6 +2,7 @@ package com.nabil.smartkrishi.features.auth
 
 data class LoginUIState(
     val phoneInput: String = "",
+    val passwordInput: String = "",
     val errorMessage: String? = null,
     val isEnglish: Boolean = true,
     val isLoading: Boolean = false,

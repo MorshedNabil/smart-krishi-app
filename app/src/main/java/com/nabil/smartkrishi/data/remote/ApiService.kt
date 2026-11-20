@@ -1,6 +1,8 @@
 package com.nabil.smartkrishi.data.remote
 
 import com.nabil.smartkrishi.data.remote.dto.DivisionDto
+import com.nabil.smartkrishi.data.remote.dto.LoginRequestDto
+import com.nabil.smartkrishi.data.remote.dto.LoginResponseDto
 import com.nabil.smartkrishi.data.remote.dto.MarketPriceDto
 import com.nabil.smartkrishi.data.remote.dto.SendOtpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.SignUpRequestDto
@@ -42,4 +44,8 @@ interface ApiService {
     // API for sending OTP message
     @POST("auth/accounts/send-otp/")
     suspend fun sendOtp(@Body request: SendOtpRequestDto): Response<Unit>
+
+    // API for user login
+    @POST("auth/accounts/login/")
+    suspend fun loginUser(@Body request: LoginRequestDto): LoginResponseDto
 }

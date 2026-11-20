@@ -5,6 +5,7 @@ import com.nabil.smartkrishi.data.local.dao.UserDao
 import com.nabil.smartkrishi.data.local.entity.toDomain
 import com.nabil.smartkrishi.data.remote.ApiService
 import com.nabil.smartkrishi.data.remote.RetrofitClient
+import com.nabil.smartkrishi.data.remote.dto.LoginRequestDto
 import com.nabil.smartkrishi.data.remote.dto.SignUpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.toDomain
 import com.nabil.smartkrishi.data.remote.dto.toEntity
@@ -65,6 +66,39 @@ class UserRepository(
             userDto.toDomain()
         }.onFailure { exception ->
             safeLogE("Failed to fetch user profile", exception)
+        }
+    }
+
+    /**
+     * Authenticates user via POST /auth/accounts/login/ with phone number and password,
+     * stores JWT access token, and caches the user profile in Room DB.
+     */
+    suspend fun loginUser(phone: String, password: String): Result<User> {
+        return runCatching {
+            safeLogD("Logging in user with phone: $phone")
+            val requestDto = LoginRequestDto(
+                phoneNumber = phone,
+                password = password
+            )
+            val response = apiService.loginUser(requestDto)
+            val userDto = response.user ?: throw Exception("User object is null in login response")
+            val accessToken = response.tokens?.access
+
+            if (!accessToken.isNullOrBlank()) {
+                RetrofitClient.authToken = accessToken
+                safeLogD("Successfully captured JWT access token")
+            } else {
+                safeLogE("JWT access token is null or empty in login response")
+            }
+
+            val entity = userDto.toEntity()
+            userDao.clearUsers()
+            userDao.insertUser(entity)
+
+            safeLogD("Successfully logged in and cached user profile")
+            userDto.toDomain()
+        }.onFailure { exception ->
+            safeLogE("Failed to login user", exception)
         }
     }
 
