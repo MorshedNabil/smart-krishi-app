@@ -9,6 +9,7 @@ import com.nabil.smartkrishi.data.remote.dto.LoginRequestDto
 import com.nabil.smartkrishi.data.remote.dto.SignUpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.toDomain
 import com.nabil.smartkrishi.data.remote.dto.toEntity
+import com.nabil.smartkrishi.data.security.TokenManager
 import com.nabil.smartkrishi.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -17,9 +18,10 @@ import kotlinx.coroutines.runBlocking
 /**
  * Repository acting as Single Source of Truth (SSOT) for User data.
  */
-class UserRepository(
+class UserRepository @JvmOverloads constructor(
     private val userDao: UserDao,
-    private val apiService: ApiService = RetrofitClient.apiService
+    private val apiService: ApiService = RetrofitClient.apiService,
+    private val tokenManager: TokenManager? = null
 ) {
     /*
      * Custom functions for logging in unit test environments.
@@ -83,8 +85,13 @@ class UserRepository(
             val response = apiService.loginUser(requestDto)
             val userDto = response.user ?: throw Exception("User object is null in login response")
             val accessToken = response.tokens?.access
+            val refreshToken = response.tokens?.refresh
 
-            if (!accessToken.isNullOrBlank()) {
+            if (!accessToken.isNullOrBlank() && !refreshToken.isNullOrBlank()) {
+                tokenManager?.saveTokens(accessToken, refreshToken)
+                RetrofitClient.authToken = accessToken
+                safeLogD("Successfully saved JWT access and refresh tokens via TokenManager")
+            } else if (!accessToken.isNullOrBlank()) {
                 RetrofitClient.authToken = accessToken
                 safeLogD("Successfully captured JWT access token")
             } else {

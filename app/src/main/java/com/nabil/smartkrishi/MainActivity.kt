@@ -14,7 +14,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.nabil.smartkrishi.data.local.AppDatabase
+import com.nabil.smartkrishi.data.remote.RetrofitClient
 import com.nabil.smartkrishi.data.repository.LocationRepository
+import com.nabil.smartkrishi.data.security.TokenManager
 import com.nabil.smartkrishi.features.auth.LoginScreen
 import com.nabil.smartkrishi.features.auth.SignUpScreen
 import com.nabil.smartkrishi.features.profile.ProfileScreen
@@ -32,6 +34,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val tokenManager = TokenManager(applicationContext)
+        RetrofitClient.authToken = tokenManager.getAccessToken()
 
         // Pre-populate location data into Room DB on app launch
         lifecycleScope.launch(Dispatchers.IO) {
@@ -114,10 +119,11 @@ class MainActivity : ComponentActivity() {
                                 ).show()
                             },
                             onLogoutClick = {
+                                tokenManager.clearTokens()
                                 lifecycleScope.launch(Dispatchers.IO) {
                                     try {
                                         AppDatabase.getInstance(applicationContext).userDao().clearUsers()
-                                        Log.d("MainActivity", "Successfully cleared cached user data on logout")
+                                        Log.d("MainActivity", "Successfully cleared cached user data and secure tokens on logout")
                                     } catch (e: Exception) {
                                         Log.e("MainActivity", "Failed to clear cached user data on logout", e)
                                     }

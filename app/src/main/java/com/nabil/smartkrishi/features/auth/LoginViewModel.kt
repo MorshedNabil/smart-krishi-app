@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.nabil.smartkrishi.data.local.AppDatabase
 import com.nabil.smartkrishi.data.repository.UserRepository
+import com.nabil.smartkrishi.data.security.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,9 +20,11 @@ class LoginViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
+    private val tokenManager by lazy { TokenManager(application) }
     private val userRepository: UserRepository by lazy {
         UserRepository(
-            userDao = AppDatabase.getInstance(application).userDao()
+            userDao = AppDatabase.getInstance(application).userDao(),
+            tokenManager = tokenManager
         )
     }
 
