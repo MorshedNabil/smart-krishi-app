@@ -25,7 +25,7 @@ Our goal is to reduce price exploitation and ensure farmers receive the value th
 
 ## 🛠 Tech Stack
 - **Mobile App Development:** Kotlin, Jetpack Compose, Retrofit, Room
-- **Backend API:** Django Rest Framework (Python)  
+- **Backend API:** Django Rest Framework (Python), JWT Authentication  
 - **Machine Learning:** Python  
 - **Database:** PostgreSQL  
 
@@ -65,14 +65,10 @@ flowchart TB
         Django <--> DB
     end
 
-    Firebase["Firebase Phone Authentication"]
     Cloudinary["Cloudinary Image Storage"]
 
-    Firebase -->|"Firebase ID Token"| UI
-
     Retrofit <-->|"HTTPS / REST API"| Django
-
-    Retrofit -.->|"Authenticated requests"| Django
+    Retrofit -.->|"JWT Authenticated Requests (Issued & Verified by Django)"| Django
 
     UI <-->|"Direct Image Upload"| Cloudinary
 ```
