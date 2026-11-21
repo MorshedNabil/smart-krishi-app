@@ -13,6 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nabil.smartkrishi.ui.theme.SmartKrishiTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,8 +39,9 @@ class SignUpScreenTest {
         composeTestRule.onAllNodesWithText("Sign up").assertCountEquals(2)
 
         // Verify Form Labels
+        composeTestRule.onNodeWithText("First Name").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Last Name").assertIsDisplayed()
         composeTestRule.onNodeWithText("Phone").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Nid").assertIsDisplayed()
         composeTestRule.onNodeWithText("Division").assertIsDisplayed()
         composeTestRule.onNodeWithText("District").assertIsDisplayed()
         composeTestRule.onNodeWithText("Village Name").assertIsDisplayed()
@@ -96,8 +98,9 @@ class SignUpScreenTest {
         var submittedData: SignUpFormData? = null
 
         val testFormData = SignUpFormData(
+            firstName = "John",
+            lastName = "Doe",
             phone = "1712345678",
-            nidNumber = "1234567890",
             division = "Dhaka",
             district = "Chittagong",
             villageName = "Rahitpur",
@@ -122,11 +125,54 @@ class SignUpScreenTest {
 
         // Verify Submitted Form Data
         assertNotNull("Submitted form data should not be null", submittedData)
+        assertEquals("John", submittedData?.firstName)
+        assertEquals("Doe", submittedData?.lastName)
         assertEquals("1712345678", submittedData?.phone)
-        assertEquals("1234567890", submittedData?.nidNumber)
         assertEquals("Dhaka", submittedData?.division)
         assertEquals("Chittagong", submittedData?.district)
         assertEquals("Rahitpur", submittedData?.villageName)
         assertEquals("Vendor", submittedData?.role)
+    }
+
+    @Test
+    fun signUpScreen_fillingFormAndClickingSignUp_triggersRegistrationCallback() {
+        var isSignUpClicked = false
+        val testFormData = SignUpFormData(
+            firstName = "Jane",
+            lastName = "Smith",
+            phone = "01812345678",
+            division = "Chittagong",
+            district = "Comilla",
+            villageName = "Sonar Bangla",
+            role = "Farmer"
+        )
+
+        composeTestRule.setContent {
+            SmartKrishiTheme {
+                SignUpContent(
+                    uiState = SignUpUIState(
+                        formData = testFormData
+                    ),
+                    onSignUpClick = {
+                        isSignUpClicked = true
+                    }
+                )
+            }
+        }
+
+        // Scroll to the submit button and click
+        composeTestRule.onNodeWithTag("btn_signup")
+            .performScrollTo()
+            .performClick()
+
+        // Assert callback was triggered
+        assertTrue("Sign up button click should trigger callback", isSignUpClicked)
+        assertEquals("Jane", testFormData.firstName)
+        assertEquals("Smith", testFormData.lastName)
+        assertEquals("01812345678", testFormData.phone)
+        assertEquals("Chittagong", testFormData.division)
+        assertEquals("Comilla", testFormData.district)
+        assertEquals("Sonar Bangla", testFormData.villageName)
+        assertEquals("Farmer", testFormData.role)
     }
 }

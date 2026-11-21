@@ -12,8 +12,9 @@ class SignUpFormDataTest {
     fun signUpFormData_defaultValues_areCorrect() {
         val formData = SignUpFormData()
 
+        assertEquals("", formData.firstName)
+        assertEquals("", formData.lastName)
         assertEquals("", formData.phone)
-        assertEquals("", formData.nidNumber)
         assertEquals("", formData.division)
         assertEquals("", formData.district)
         assertEquals("", formData.villageName)
@@ -23,16 +24,18 @@ class SignUpFormDataTest {
     @Test
     fun signUpFormData_customValues_areRetained() {
         val formData = SignUpFormData(
+            firstName = "John",
+            lastName = "Doe",
             phone = "1712345678",
-            nidNumber = "9876543210",
             division = "Rangpur",
             district = "Panchagarh",
             villageName = "Rahitpur",
             role = "Vendor"
         )
 
+        assertEquals("John", formData.firstName)
+        assertEquals("Doe", formData.lastName)
         assertEquals("1712345678", formData.phone)
-        assertEquals("9876543210", formData.nidNumber)
         assertEquals("Rangpur", formData.division)
         assertEquals("Panchagarh", formData.district)
         assertEquals("Rahitpur", formData.villageName)

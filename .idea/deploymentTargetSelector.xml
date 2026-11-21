@@ -4,29 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-09-28T05:20:49.023692200Z">
-          <Target type="DEFAULT_BOOT">
-            <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=RR8X2032LZB" />
-            </handle>
-          </Target>
-        </DropdownSelection>
-        <DialogSelection />
-      </SelectionState>
-      <SelectionState runConfigName="signUpScreen_displaysAllLabelsAndElements()">
-        <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-09-28T05:20:49.023692200Z">
-          <Target type="DEFAULT_BOOT">
-            <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=RR8X2032LZB" />
-            </handle>
-          </Target>
-        </DropdownSelection>
-        <DialogSelection />
-      </SelectionState>
-      <SelectionState runConfigName="signUpContent_whenSignUpClicked_triggersCallbackWithCorrectData()">
-        <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-09-28T05:20:49.023692200Z">
+        <DropdownSelection timestamp="2026-11-11T11:02:12.697434100Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="PhysicalDevice" identifier="serial=RR8X2032LZB" />
@@ -47,6 +25,17 @@
         <DialogSelection />
       </SelectionState>
       <SelectionState runConfigName="signUpScreen_divisionAndDistrictDropdowns_displayOptionsAndTriggerCallbacks()">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2026-09-28T05:20:49.023692200Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=RR8X2032LZB" />
+            </handle>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
+      </SelectionState>
+      <SelectionState runConfigName="signUpScreen_fillingFormAndClickingSignUp_triggersRegistrationCallback()">
         <option name="selectionMode" value="DROPDOWN" />
         <DropdownSelection timestamp="2026-09-28T05:20:49.023692200Z">
           <Target type="DEFAULT_BOOT">

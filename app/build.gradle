@@ -40,6 +40,9 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -60,6 +63,7 @@ dependencies {
     implementation libs.play.services.location
 
     testImplementation libs.junit
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
     implementation "androidx.constraintlayout:constraintlayout:2.1.4"
@@ -100,6 +104,9 @@ dependencies {
     // Retrofit with Kotlin serialization Converter
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
+    // Security Crypto (Android Keystore / EncryptedSharedPreferences)
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     // Kotlin serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")

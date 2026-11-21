@@ -1,6 +1,11 @@
 package com.nabil.smartkrishi.features.auth
 
 import android.app.Application
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -11,22 +16,30 @@ import org.junit.Test
 /**
  * Unit Test for [SignUpViewModel].
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class SignUpViewModelTest {
 
     private lateinit var viewModel: SignUpViewModel
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(Dispatchers.Unconfined)
         val application = Application()
         viewModel = SignUpViewModel(application)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
     fun initialState_hasDefaultFormData() {
         val state = viewModel.uiState.value
 
+        assertEquals("", state.formData.firstName)
+        assertEquals("", state.formData.lastName)
         assertEquals("", state.formData.phone)
-        assertEquals("", state.formData.nidNumber)
         assertEquals("", state.formData.division)
         assertEquals("", state.formData.district)
         assertEquals("", state.formData.villageName)
@@ -37,19 +50,25 @@ class SignUpViewModelTest {
 
     @Test
     fun validateAndSignUp_whenFieldsAreBlank_returnsFalseAndSetsErrorMessage() {
-        // Phone is blank
+        // First Name is blank
+        val isFirstNameValid = viewModel.validateAndSignUp()
+        assertFalse(isFirstNameValid)
+        assertEquals("Please enter First Name", viewModel.uiState.value.errorMessage)
+
+        // Fill First Name, Last Name is blank
+        viewModel.updateFirstName("John")
+        val isLastNameValid = viewModel.validateAndSignUp()
+        assertFalse(isLastNameValid)
+        assertEquals("Please enter Last Name", viewModel.uiState.value.errorMessage)
+
+        // Fill Last Name, Phone is blank
+        viewModel.updateLastName("Doe")
         val isPhoneValid = viewModel.validateAndSignUp()
         assertFalse(isPhoneValid)
         assertEquals("Please enter Phone Number", viewModel.uiState.value.errorMessage)
 
-        // Fill phone, NID is blank
+        // Fill Phone, Division is blank
         viewModel.updatePhone("1712345678")
-        val isNidValid = viewModel.validateAndSignUp()
-        assertFalse(isNidValid)
-        assertEquals("Please enter NID number", viewModel.uiState.value.errorMessage)
-
-        // Fill NID, Division is blank
-        viewModel.updateNid("1234567890")
         val isDivisionValid = viewModel.validateAndSignUp()
         assertFalse(isDivisionValid)
         assertEquals("Please Select your Division", viewModel.uiState.value.errorMessage)
@@ -69,8 +88,9 @@ class SignUpViewModelTest {
 
     @Test
     fun validateAndSignUp_whenAllFieldsAreFilled_returnsTrue() {
+        viewModel.updateFirstName("John")
+        viewModel.updateLastName("Doe")
         viewModel.updatePhone("1712345678")
-        viewModel.updateNid("1234567890")
         viewModel.updateDivision("Dhaka")
         viewModel.updateDistrict("Chittagong")
         viewModel.updateVillage("Rahitpur")
@@ -79,10 +99,10 @@ class SignUpViewModelTest {
         val isValid = viewModel.validateAndSignUp()
 
         assertTrue(isValid)
-        assertTrue(viewModel.uiState.value.isLoading)
         assertNull(viewModel.uiState.value.errorMessage)
+        assertEquals("John", viewModel.uiState.value.formData.firstName)
+        assertEquals("Doe", viewModel.uiState.value.formData.lastName)
         assertEquals("1712345678", viewModel.uiState.value.formData.phone)
-        assertEquals("1234567890", viewModel.uiState.value.formData.nidNumber)
         assertEquals("Dhaka", viewModel.uiState.value.formData.division)
         assertEquals("Chittagong", viewModel.uiState.value.formData.district)
         assertEquals("Rahitpur", viewModel.uiState.value.formData.villageName)

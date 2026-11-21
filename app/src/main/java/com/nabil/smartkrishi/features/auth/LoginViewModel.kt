@@ -1,45 +1,49 @@
 package com.nabil.smartkrishi.features.auth
 
-import android.app.Activity
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ViewModel
-import com.google.firebase.FirebaseException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.nabil.smartkrishi.data.local.AppDatabase
+import com.nabil.smartkrishi.data.repository.UserRepository
+import com.nabil.smartkrishi.data.security.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.util.concurrent.TimeUnit
-
+import kotlinx.coroutines.launch
 
 /**
- * ViewModel managing Login state, input validations, and Firebase Phone Authentication.
+ * ViewModel managing Login state, input validations, and authentication via POST /auth/accounts/login/.
  */
-class LoginViewModel : ViewModel() {
+class LoginViewModel(
+    application: Application
+) : AndroidViewModel(application) {
 
-    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    private val tokenManager by lazy { TokenManager(application) }
+    private val userRepository: UserRepository by lazy {
+        UserRepository(
+            userDao = AppDatabase.getInstance(application).userDao(),
+            tokenManager = tokenManager
+        )
+    }
 
     private val _uiState = MutableStateFlow(LoginUIState())
     val uiState: StateFlow<LoginUIState> = _uiState.asStateFlow()
-
-    init {
-        checkUserLoggedIn()
-    }
-
-    fun checkUserLoggedIn() {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            _uiState.update { it.copy(isUserLoggedIn = true) }
-        }
-    }
 
     fun onPhoneChange(phone: String) {
         _uiState.update {
             it.copy(
                 phoneInput = phone,
+                errorMessage = null
+            )
+        }
+    }
+
+    fun onPasswordChange(password: String) {
+        _uiState.update {
+            it.copy(
+                passwordInput = password,
                 errorMessage = null
             )
         }
@@ -53,76 +57,51 @@ class LoginViewModel : ViewModel() {
         _uiState.update { it.copy(errorMessage = null) }
     }
 
-    fun requestPhoneVerification(
-        activity: Activity,
-        onCodeSent: (verificationId: String) -> Unit
-    ) {
+    /**
+     * Authenticates user via POST /auth/accounts/login/ with phone number and password (PIN).
+     */
+    fun loginUser(onLoginSuccess: () -> Unit) {
         val phone = _uiState.value.phoneInput.trim()
+        val password = _uiState.value.passwordInput.trim()
+
         if (phone.isEmpty()) {
             _uiState.update { it.copy(errorMessage = "Please enter phone number") }
             return
         }
-
-        val phoneNumber = "+880$phone"
-        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
-        val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-            override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                signInWithCredential(credential)
-            }
-
-            override fun onVerificationFailed(e: FirebaseException) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message ?: "Verification failed"
-                    )
-                }
-                Log.e("LoginViewModel", "Verification failed", e)
-            }
-
-            override fun onCodeSent(
-                verificationId: String,
-                token: PhoneAuthProvider.ForceResendingToken
-            ) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        verificationId = verificationId
-                    )
-                }
-                Log.d("LoginViewModel", "Code sent successfully")
-                onCodeSent(verificationId)
-            }
+        if (password.length != 6 || !password.all { it.isDigit() }) {
+            _uiState.update { it.copy(errorMessage = "Please enter your valid 6-digit PIN") }
+            return
         }
 
-        val options = PhoneAuthOptions.newBuilder(auth)
-            .setPhoneNumber(phoneNumber)
-            .setTimeout(60L, TimeUnit.SECONDS)
-            .setActivity(activity)
-            .setCallbacks(callbacks)
-            .build()
+        val formattedPhone = formatPhoneNumber(phone)
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-        PhoneAuthProvider.verifyPhoneNumber(options)
+        viewModelScope.launch {
+            val result = userRepository.loginUser(formattedPhone, password)
+            _uiState.update { it.copy(isLoading = false) }
+
+            if (result.isSuccess) {
+                _uiState.update { it.copy(isUserLoggedIn = true) }
+                Log.d("LoginViewModel", "Login successful")
+                onLoginSuccess()
+            } else {
+                val errorMsg = result.exceptionOrNull()?.localizedMessage ?: "Login failed. Please check your credentials."
+                _uiState.update { it.copy(errorMessage = errorMsg) }
+                Log.e("LoginViewModel", "Login failed", result.exceptionOrNull())
+            }
+        }
     }
 
-    fun signInWithCredential(
-        credential: PhoneAuthCredential,
-        onSuccess: () -> Unit = {}
-    ) {
-        _uiState.update { it.copy(isLoading = true) }
-        auth.signInWithCredential(credential).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                _uiState.update { it.copy(isLoading = false, isUserLoggedIn = true) }
-                onSuccess()
-            } else {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = task.exception?.message ?: "Sign in failed"
-                    )
-                }
-            }
+    /**
+     * format the phone number
+     */
+    fun formatPhoneNumber(phoneNumber: String): String {
+        val digits = phoneNumber.filter { it.isDigit() }
+
+        return when {
+            digits.startsWith("880") -> "+$digits"
+            digits.startsWith("0") -> "+88$digits"
+            else -> "+880$digits"
         }
     }
 }

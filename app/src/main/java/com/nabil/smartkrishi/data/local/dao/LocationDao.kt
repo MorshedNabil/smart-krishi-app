@@ -45,6 +45,9 @@ interface LocationDao {
     @Query("SELECT name FROM villages WHERE districtName = :districtName ORDER BY name ASC")
     fun getVillageNamesByDistrictFlow(districtName: String): Flow<List<String>>
 
+    @Query("SELECT id FROM villages WHERE name = :villageName LIMIT 1")
+    suspend fun getVillageIdByName(villageName: String): Int?
+
     @Query("SELECT COUNT(*) FROM villages")
     suspend fun getVillagesCount(): Int
 

@@ -19,6 +19,8 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+import com.nabil.smartkrishi.data.repository.UserRepository
+
 /**
  * HomeViewModel handles state logic for Home Screen and triggers Retrofit API calls via HomeRepository.
  */
@@ -30,6 +32,11 @@ class HomeViewModel(
     private val weatherRepository by lazy {
         WeatherRepository(
             weatherDao = AppDatabase.getInstance(application).weatherDao()
+        )
+    }
+    private val userRepository by lazy {
+        UserRepository(
+            userDao = AppDatabase.getInstance(application).userDao()
         )
     }
 
@@ -45,12 +52,44 @@ class HomeViewModel(
     private val _weatherState = MutableStateFlow<WeatherUIState>(WeatherUIState())
     val weatherState: StateFlow<WeatherUIState> = _weatherState.asStateFlow()
 
+    // ============== User Name State ==============
+    private val _userNameState = MutableStateFlow("User")
+    val userNameState: StateFlow<String> = _userNameState.asStateFlow()
+
     // Active fetch job handle to avoid duplicate concurrent API calls
     private var fetchWeatherJob: Job? = null
 
     init {
         loadHomeData()
         observeWeatherData()
+        observeUser()
+        refreshUserProfile()
+    }
+
+    /**
+     *  Refresh user's data whenever app starts
+     */
+    private fun refreshUserProfile() {
+        viewModelScope.launch {
+            try {
+                userRepository.refreshUserProfile()
+            } catch (e: Exception) {
+                // Offline fallback: Room DB cache is used automatically via observeUser()
+            }
+        }
+    }
+
+    private fun observeUser() {
+        viewModelScope.launch {
+            userRepository.getUserStream().collect { user ->
+                val firstName = user?.firstName?.trim()
+                if (!firstName.isNullOrBlank()) {
+                    _userNameState.value = firstName
+                } else {
+                    _userNameState.value = "User"
+                }
+            }
+        }
     }
 
     // ============================ MarketPrice Section =============================

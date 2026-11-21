@@ -1,6 +1,5 @@
 package com.nabil.smartkrishi.features.auth
 
-import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +35,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
@@ -44,6 +42,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -184,10 +183,65 @@ fun LoginPhoneInputField(
 }
 
 /**
- * Get OTP Action Button with loading progress indicator animation.
+ * PIN / Password Input Field Component for Login (6-digit number).
  */
 @Composable
-fun GetOtpButton(
+fun LoginPasswordInputField(
+    passwordValue: String,
+    onPasswordChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    hint: String = "Enter 6-digit PIN"
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(60.dp)
+            .background(InputFieldBgColor, shape = RoundedCornerShape(16.dp))
+            .padding(horizontal = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxSize(),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            if (passwordValue.isEmpty()) {
+                Text(
+                    text = hint,
+                    color = Color.White.copy(alpha = 0.7f),
+                    fontSize = 16.sp
+                )
+            }
+            BasicTextField(
+                value = passwordValue,
+                onValueChange = { newValue ->
+                    if (newValue.length <= 6 && newValue.all { it.isDigit() }) {
+                        onPasswordChange(newValue)
+                    }
+                },
+                singleLine = true,
+                textStyle = TextStyle(
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                visualTransformation = PasswordVisualTransformation(),
+                cursorBrush = SolidColor(Color.White),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { contentDescription = hint }
+            )
+        }
+    }
+}
+
+/**
+ * Login Action Button with loading progress indicator animation.
+ */
+@Composable
+fun LoginButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isLoading: Boolean = false
@@ -201,7 +255,7 @@ fun GetOtpButton(
         ),
         shape = RoundedCornerShape(28.dp),
         modifier = modifier
-            .testTag("btn_get_otp")
+            .testTag("btn_login")
             .width(160.dp)
             .height(55.dp)
     ) {
@@ -213,7 +267,7 @@ fun GetOtpButton(
             )
         } else {
             Text(
-                text = "Get OTP",
+                text = "Login",
                 color = Color.White,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
@@ -229,24 +283,19 @@ fun GetOtpButton(
 fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = viewModel(),
-    onGetOtpClick: (verificationId: String) -> Unit = {},
+    onLoginSuccess: () -> Unit = {},
     onSignUpClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     LoginContent(
         modifier = modifier,
         uiState = uiState,
         onPhoneChange = viewModel::onPhoneChange,
+        onPasswordChange = viewModel::onPasswordChange,
         onLanguageToggle = viewModel::onLanguageToggle,
-        onGetOtpClick = {
-            val activity = context as? Activity
-            if (activity != null) {
-                viewModel.requestPhoneVerification(activity) { verificationId ->
-                    onGetOtpClick(verificationId)
-                }
-            }
+        onLoginClick = {
+            viewModel.loginUser(onLoginSuccess)
         },
         onSignUpClick = onSignUpClick
     )
@@ -260,8 +309,9 @@ fun LoginContent(
     uiState: LoginUIState,
     modifier: Modifier = Modifier,
     onPhoneChange: (String) -> Unit = {},
+    onPasswordChange: (String) -> Unit = {},
     onLanguageToggle: (Boolean) -> Unit = {},
-    onGetOtpClick: () -> Unit = {},
+    onLoginClick: () -> Unit = {},
     onSignUpClick: () -> Unit = {}
 ) {
     Box(
@@ -332,6 +382,23 @@ fun LoginContent(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Password / PIN Field Label
+                Text(
+                    text = "Password (6-digit PIN)",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                // Password Input Field
+                LoginPasswordInputField(
+                    passwordValue = uiState.passwordInput,
+                    onPasswordChange = onPasswordChange
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 // Don't have an account? Sign up link
                 TextButton(
                     onClick = onSignUpClick,
@@ -347,13 +414,13 @@ fun LoginContent(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Get OTP Button with Loading Animation
+                // Login Button with Loading Animation
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    GetOtpButton(
-                        onClick = onGetOtpClick,
+                    LoginButton(
+                        onClick = onLoginClick,
                         isLoading = uiState.isLoading
                     )
                 }
