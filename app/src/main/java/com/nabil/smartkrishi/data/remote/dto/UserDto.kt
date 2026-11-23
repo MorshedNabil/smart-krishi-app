@@ -6,7 +6,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Network DTO representing the user profile response from GET /auth/accounts/me/
+ * User DTOs representing user profile requests, responses, and Room/Domain mappers.
  */
 @Serializable
 data class UserResponseDto(
@@ -44,6 +44,7 @@ data class UserDto(
     val updatedAt: String?
 )
 
+// ===================== Mapper Functions ========================
 
 /**
  * Mapper from UserDto to UserEntity.
