@@ -55,7 +55,7 @@ class WeatherRepository(
         lon: Double,
         locationKey: String = "default"
     ): Result<Unit> {
-        return runCatching {
+        return com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.safeApiCall {
             Log.d("WeatherRepository", "Fetching fresh weather for lat: $lat, lon: $lon")
             val dto = apiService.getWeather(latitude = lat, longitude = lon)
             val entity = dto.toEntity(locationKey)

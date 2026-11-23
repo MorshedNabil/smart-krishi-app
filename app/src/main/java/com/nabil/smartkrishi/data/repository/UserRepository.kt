@@ -55,7 +55,7 @@ class UserRepository @JvmOverloads constructor(
      * Fetches current user profile from GET /auth/accounts/me/ API and caches it into Room DB.
      */
     suspend fun refreshUserProfile(): Result<User> {
-        return runCatching {
+        return com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.safeApiCall {
             safeLogD("Fetching user profile from API")
             val response = apiService.getUserProfile()
             val userDto = response.user ?: throw Exception("User object is null in API response")
@@ -76,7 +76,7 @@ class UserRepository @JvmOverloads constructor(
      * stores JWT access token, and caches the user profile in Room DB.
      */
     suspend fun loginUser(phone: String, password: String): Result<User> {
-        return runCatching {
+        return com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.safeApiCall {
             safeLogD("Logging in user with phone: $phone")
             val requestDto = LoginRequestDto(
                 phoneNumber = phone,
@@ -120,7 +120,7 @@ class UserRepository @JvmOverloads constructor(
         villageId: Int,
         profileImage: String? = null
     ): Result<User> {
-        return runCatching {
+        return com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.safeApiCall {
             safeLogD("Registering user with phone: $phone")
             val requestDto = SignUpRequestDto(
                 firstName = firstName,

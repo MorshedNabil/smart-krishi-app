@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.nabil.smartkrishi.data.local.AppDatabase
+import com.nabil.smartkrishi.data.remote.error.ApiErrorHandler
 import com.nabil.smartkrishi.data.repository.UserRepository
 import com.nabil.smartkrishi.data.security.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -85,7 +86,7 @@ class LoginViewModel(
                 Log.d("LoginViewModel", "Login successful")
                 onLoginSuccess()
             } else {
-                val errorMsg = result.exceptionOrNull()?.localizedMessage ?: "Login failed. Please check your credentials."
+                val errorMsg = ApiErrorHandler.getErrorMessage(result.exceptionOrNull())
                 _uiState.update { it.copy(errorMessage = errorMsg) }
                 Log.e("LoginViewModel", "Login failed", result.exceptionOrNull())
             }

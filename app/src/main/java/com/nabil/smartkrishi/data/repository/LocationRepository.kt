@@ -44,7 +44,7 @@ class LocationRepository(
      * location hierarchy from backend API, flattens it, and populates Room DB.
      */
     suspend fun syncLocationsIfNeeded(): Result<Unit> {
-        return runCatching {
+        return com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.safeApiCall {
             val divisionsCount = locationDao.getDivisionsCount()
             if (divisionsCount == 0) {
                 Log.d("LocationRepository", "Room DB locations empty. Fetching locations from API...")

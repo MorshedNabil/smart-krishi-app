@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /**
- * Network Data Transfer Object (DTO) matching the Django Weather API response structure.
+ * Weather DTOs and Mappers matching the Django Weather API response structure.
  */
 @Serializable
 data class WeatherResponseDto(
