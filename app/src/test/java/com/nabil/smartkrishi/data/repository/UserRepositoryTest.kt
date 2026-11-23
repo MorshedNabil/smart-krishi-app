@@ -141,4 +141,8 @@ class FakeApiService : ApiService {
             tokens = TokenDto(access = "access-token-123", refresh = "refresh-token-123")
         )
     }
+
+    override fun refreshToken(request: com.nabil.smartkrishi.data.remote.dto.RefreshTokenRequestDto): retrofit2.Call<com.nabil.smartkrishi.data.remote.dto.RefreshTokenResponseDto> {
+        throw NotImplementedError()
+    }
 }

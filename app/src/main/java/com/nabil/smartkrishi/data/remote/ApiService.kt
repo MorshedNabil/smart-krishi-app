@@ -8,6 +8,9 @@ import com.nabil.smartkrishi.data.remote.dto.SendOtpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.SignUpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.UserResponseDto
 import com.nabil.smartkrishi.data.remote.dto.WeatherResponseDto
+import com.nabil.smartkrishi.data.remote.dto.RefreshTokenRequestDto
+import com.nabil.smartkrishi.data.remote.dto.RefreshTokenResponseDto
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -48,4 +51,8 @@ interface ApiService {
     // API for user login
     @POST("auth/accounts/login/")
     suspend fun loginUser(@Body request: LoginRequestDto): LoginResponseDto
+
+    // API for refreshing access token using refresh token
+    @POST("api/token/refresh/")
+    fun refreshToken(@Body request: RefreshTokenRequestDto): Call<RefreshTokenResponseDto>
 }
