@@ -218,10 +218,12 @@ class SignUpViewModel(
                     Log.d("SignUpViewModel", "OTP Code sent successfully via backend API")
                     onCodeSent("otp_sent", formattedData, villageId)
                 } else {
-                    _uiState.update { it.copy(errorMessage = "Failed to send OTP. Please check the phone number.") }
+                    val apiException = com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.parseResponseError(response)
+                    _uiState.update { it.copy(errorMessage = apiException.getUserFriendlyMessage()) }
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Failed to send OTP") }
+                val errorMsg = com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.getErrorMessage(e)
+                _uiState.update { it.copy(isLoading = false, errorMessage = errorMsg) }
                 Log.e("SignUpViewModel", "Send OTP failed", e)
             }
         }

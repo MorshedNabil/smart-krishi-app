@@ -4,6 +4,7 @@ import android.util.Log
 import com.nabil.smartkrishi.data.remote.ApiService
 import com.nabil.smartkrishi.data.remote.RetrofitClient
 import com.nabil.smartkrishi.data.remote.dto.toMarketPriceDO
+import com.nabil.smartkrishi.data.remote.error.ApiErrorHandler
 import com.nabil.smartkrishi.domain.model.MarketPrice
 
 
@@ -19,7 +20,7 @@ class HomeRepository(
      * Fetches market price from the API and converts DTO to domain MarketPrice object.
      */
     suspend fun getMarketPrices(): Result<MarketPrice> {
-        return runCatching {
+        return ApiErrorHandler.safeApiCall {
             val marketPriceDTO = apiService.getMarketPrices()
             Log.d("HomeRepository", "getMarketPrices: $marketPriceDTO")
             marketPriceDTO.toMarketPriceDO()
