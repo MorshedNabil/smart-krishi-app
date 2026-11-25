@@ -9,6 +9,7 @@ import com.nabil.smartkrishi.data.remote.dto.LoginRequestDto
 import com.nabil.smartkrishi.data.remote.dto.SignUpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.toDomain
 import com.nabil.smartkrishi.data.remote.dto.toEntity
+import com.nabil.smartkrishi.data.remote.error.ApiErrorHandler
 import com.nabil.smartkrishi.data.security.TokenManager
 import com.nabil.smartkrishi.domain.model.User
 import kotlinx.coroutines.flow.Flow
@@ -120,7 +121,7 @@ class UserRepository @JvmOverloads constructor(
         villageId: Int,
         profileImage: String? = null
     ): Result<User> {
-        return com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.safeApiCall {
+        return ApiErrorHandler.safeApiCall {
             safeLogD("Registering user with phone: $phone")
             val requestDto = SignUpRequestDto(
                 firstName = firstName,
@@ -146,16 +147,22 @@ class UserRepository @JvmOverloads constructor(
     }
 
     /**
-     * Synchronous blocking wrapper for registerUser, useful for Java interoperability (e.g. OtpVerification).
+     * Synchronous blocking wrapper for registerUser, returning null on success,
+     * or a human-readable error message String on failure (useful for Java interoperability like OtpVerification).
      */
-    fun registerUserSync(
+    fun registerUserSyncOrError(
         firstName: String,
         lastName: String,
         phone: String,
         role: String,
         villageId: Int,
         profileImage: String? = null
-    ): User? = runBlocking {
-        registerUser(firstName, lastName, phone, role, villageId, profileImage).getOrNull()
+    ): String? = runBlocking {
+        val result = registerUser(firstName, lastName, phone, role, villageId, profileImage)
+        if (result.isSuccess) {
+            null
+        } else {
+            ApiErrorHandler.getErrorMessage(result.exceptionOrNull())
+        }
     }
 }

@@ -68,6 +68,8 @@ class JWTAuthenticator(
             val refreshToken = tokenManager()?.getRefreshToken() ?: return null
 
             return try {
+                // Call api 'api/token/refresh' to get the new refresh and access token
+                // This need to be a synchronous call otherwise multiple call for refresh token will generate for multiple API failure
                 val refreshResponse = RetrofitClient.apiService.refreshToken(
                     RefreshTokenRequestDto(refresh = refreshToken)
                 ).execute()
@@ -78,7 +80,7 @@ class JWTAuthenticator(
 
                     if (!newAccessToken.isNullOrBlank()) {
                         val newRefreshToken = newTokens.refresh ?: refreshToken
-                        tokenManager()?.saveTokens(newAccessToken, newRefreshToken)
+                        tokenManager()?.saveTokens(newAccessToken, newRefreshToken) // save the new tokens in encrypted SharedPreferences
                         RetrofitClient.authToken = newAccessToken
 
                         safeLogD("Successfully refreshed JWT token automatically on 401")
