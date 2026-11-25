@@ -13,9 +13,11 @@ import com.nabil.smartkrishi.data.remote.dto.toEntity
 import com.nabil.smartkrishi.data.remote.error.ApiErrorHandler
 import com.nabil.smartkrishi.data.security.TokenManager
 import com.nabil.smartkrishi.domain.model.User
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 /**
  * Repository acting as Single Source of Truth (SSOT) for User data.
@@ -57,7 +59,7 @@ class UserRepository @JvmOverloads constructor(
      * Fetches current user profile from GET /auth/accounts/me/ API and caches it into Room DB.
      */
     suspend fun refreshUserProfile(): Result<User> {
-        return com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.safeApiCall {
+        return ApiErrorHandler.safeApiCall {
             safeLogD("Fetching user profile from API")
             val response = apiService.getUserProfile()
             val userDto = response.user ?: throw Exception("User object is null in API response")
@@ -78,7 +80,7 @@ class UserRepository @JvmOverloads constructor(
      * stores JWT access token, and caches the user profile in Room DB.
      */
     suspend fun loginUser(phone: String, password: String): Result<User> {
-        return com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.safeApiCall {
+        return ApiErrorHandler.safeApiCall {
             safeLogD("Logging in user with phone: $phone")
             val requestDto = LoginRequestDto(
                 phoneNumber = phone,
@@ -171,36 +173,35 @@ class UserRepository @JvmOverloads constructor(
      * Calls POST /auth/accounts/logout/ API with the refresh token to blacklist it on the server,
      * clears tokens from EncryptedSharedPreferences (TokenManager), resets RetrofitClient.authToken,
      * and clears cached user profile from Room DB.
+     * Runs on Dispatchers.IO to prevent main thread blocking during EncryptedSharedPreferences crypto & disk I/O.
      */
-    suspend fun logoutUser(): Result<Unit> {
-        return ApiErrorHandler.safeApiCall {
-            val refreshToken = tokenManager?.getRefreshToken()
-            safeLogD("Logging out user, refreshToken present: ${!refreshToken.isNullOrBlank()}")
+    suspend fun logoutUser(): Result<Unit> = withContext(Dispatchers.IO) {
+        val refreshToken = tokenManager?.getRefreshToken()
+        safeLogD("Logging out user, refreshToken present: ${!refreshToken.isNullOrBlank()}")
 
-            if (!refreshToken.isNullOrBlank()) {
+        // Clear local tokens and memory session immediately
+        tokenManager?.clearTokens()
+        RetrofitClient.authToken = null
+
+        // Clear cached user profile from Room DB
+        try {
+            userDao.clearUsers()
+            safeLogD("Successfully cleared local user session and database cache")
+        } catch (e: Exception) {
+            safeLogE("Failed to clear local UserDao on logout", e)
+        }
+
+        // Notify backend server to blacklist the refresh token
+        if (!refreshToken.isNullOrBlank()) {
+            try {
                 val requestDto = RefreshTokenRequestDto(refresh = refreshToken)
                 apiService.logoutUser(requestDto)
                 safeLogD("Successfully blacklisted JWT refresh token on backend")
-            }
-
-            // Clear local tokens and memory session
-            tokenManager?.clearTokens()
-            RetrofitClient.authToken = null
-
-            // Clear cached user profile from Room DB
-            userDao.clearUsers()
-            safeLogD("Successfully cleared local user session and database cache")
-
-            Unit
-        }.onFailure { exception ->
-            safeLogE("Logout API call failed, clearing local tokens as fallback", exception)
-            tokenManager?.clearTokens()
-            RetrofitClient.authToken = null
-            try {
-                userDao.clearUsers()
             } catch (e: Exception) {
-                safeLogE("Failed to clear local UserDao on logout fallback", e)
+                safeLogE("Backend logout API call failed (token still cleared locally)", e)
             }
         }
+
+        Result.success(Unit)
     }
 }

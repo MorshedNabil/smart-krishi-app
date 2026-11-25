@@ -7,10 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.nabil.smartkrishi.data.local.AppDatabase
 import com.nabil.smartkrishi.data.repository.UserRepository
 import com.nabil.smartkrishi.data.security.TokenManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ProfileViewModel(
     application: Application
@@ -50,11 +52,14 @@ class ProfileViewModel(
     /**
      * Performs user logout by calling POST auth/accounts/logout/ to blacklist the token on backend,
      * clears local EncryptedSharedPreferences tokens, and resets local session.
+     * Executes on Dispatchers.IO for fast, non-blocking execution off the UI thread.
      */
     fun logoutUser(onLogoutComplete: () -> Unit) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             userRepository.logoutUser()
-            onLogoutComplete()
+            withContext(Dispatchers.Main) {
+                onLogoutComplete()
+            }
         }
     }
 }
