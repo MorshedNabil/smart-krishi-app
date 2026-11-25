@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+import kotlinx.coroutines.flow.update
+
 class ProfileViewModel(
     application: Application
 ) : AndroidViewModel(application) {
@@ -52,13 +54,18 @@ class ProfileViewModel(
     /**
      * Performs user logout by calling POST auth/accounts/logout/ to blacklist the token on backend,
      * clears local EncryptedSharedPreferences tokens, and resets local session.
-     * Executes on Dispatchers.IO for fast, non-blocking execution off the UI thread.
+     * Sets isLoggingOut = true to trigger loading animation on the LogoutButton.
      */
     fun logoutUser(onLogoutComplete: () -> Unit) {
+        _uiState.update { it.copy(isLoggingOut = true) }
         viewModelScope.launch(Dispatchers.IO) {
-            userRepository.logoutUser()
-            withContext(Dispatchers.Main) {
-                onLogoutComplete()
+            try {
+                userRepository.logoutUser()
+            } finally {
+                withContext(Dispatchers.Main) {
+                    _uiState.update { it.copy(isLoggingOut = false) }
+                    onLogoutComplete()
+                }
             }
         }
     }
