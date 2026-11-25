@@ -6,6 +6,7 @@ import com.nabil.smartkrishi.data.local.entity.toDomain
 import com.nabil.smartkrishi.data.remote.ApiService
 import com.nabil.smartkrishi.data.remote.RetrofitClient
 import com.nabil.smartkrishi.data.remote.dto.LoginRequestDto
+import com.nabil.smartkrishi.data.remote.dto.RefreshTokenRequestDto
 import com.nabil.smartkrishi.data.remote.dto.SignUpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.toDomain
 import com.nabil.smartkrishi.data.remote.dto.toEntity
@@ -163,6 +164,43 @@ class UserRepository @JvmOverloads constructor(
             null
         } else {
             ApiErrorHandler.getErrorMessage(result.exceptionOrNull())
+        }
+    }
+
+    /**
+     * Calls POST /auth/accounts/logout/ API with the refresh token to blacklist it on the server,
+     * clears tokens from EncryptedSharedPreferences (TokenManager), resets RetrofitClient.authToken,
+     * and clears cached user profile from Room DB.
+     */
+    suspend fun logoutUser(): Result<Unit> {
+        return ApiErrorHandler.safeApiCall {
+            val refreshToken = tokenManager?.getRefreshToken()
+            safeLogD("Logging out user, refreshToken present: ${!refreshToken.isNullOrBlank()}")
+
+            if (!refreshToken.isNullOrBlank()) {
+                val requestDto = RefreshTokenRequestDto(refresh = refreshToken)
+                apiService.logoutUser(requestDto)
+                safeLogD("Successfully blacklisted JWT refresh token on backend")
+            }
+
+            // Clear local tokens and memory session
+            tokenManager?.clearTokens()
+            RetrofitClient.authToken = null
+
+            // Clear cached user profile from Room DB
+            userDao.clearUsers()
+            safeLogD("Successfully cleared local user session and database cache")
+
+            Unit
+        }.onFailure { exception ->
+            safeLogE("Logout API call failed, clearing local tokens as fallback", exception)
+            tokenManager?.clearTokens()
+            RetrofitClient.authToken = null
+            try {
+                userDao.clearUsers()
+            } catch (e: Exception) {
+                safeLogE("Failed to clear local UserDao on logout fallback", e)
+            }
         }
     }
 }

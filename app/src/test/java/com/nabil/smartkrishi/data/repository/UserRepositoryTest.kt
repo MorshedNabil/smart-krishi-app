@@ -57,6 +57,25 @@ class UserRepositoryTest {
         assertTrue(fakeUserDao.insertedUsers.isNotEmpty())
         assertEquals(1, fakeUserDao.clearedCount)
     }
+
+    @Test
+    fun logoutUser_clearsUserDataAndTokens() = runBlocking {
+        fakeUserDao.insertUser(
+            com.nabil.smartkrishi.data.local.entity.UserEntity(
+                serverId = 1,
+                firstName = "John",
+                lastName = "Doe",
+                phone = "01712345678",
+                role = "farmer"
+            )
+        )
+
+        val result = userRepository.logoutUser()
+
+        assertTrue(result.isSuccess)
+        assertTrue(fakeUserDao.insertedUsers.isEmpty())
+        assertTrue(fakeUserDao.clearedCount > 0)
+    }
 }
 
 class FakeUserDao : UserDao {
@@ -140,6 +159,10 @@ class FakeApiService : ApiService {
             ),
             tokens = TokenDto(access = "access-token-123", refresh = "refresh-token-123")
         )
+    }
+
+    override suspend fun logoutUser(request: com.nabil.smartkrishi.data.remote.dto.RefreshTokenRequestDto): retrofit2.Response<Unit> {
+        return retrofit2.Response.success(Unit)
     }
 
     override fun refreshToken(request: com.nabil.smartkrishi.data.remote.dto.RefreshTokenRequestDto): retrofit2.Call<com.nabil.smartkrishi.data.remote.dto.RefreshTokenResponseDto> {

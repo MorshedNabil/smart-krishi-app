@@ -448,7 +448,9 @@ fun ProfileScreen(
             onSaveClick(uiState)
         } ,
         onBackClick = onBackClick,
-        onLogoutClick = onLogoutClick
+        onLogoutClick = {
+            viewModel.logoutUser(onLogoutClick)
+        }
     )
 }
 
