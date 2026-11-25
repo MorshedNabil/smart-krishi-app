@@ -73,7 +73,6 @@ dependencies {
 
     // ============== Firebase Dependencies =============
     implementation platform('com.google.firebase:firebase-bom:34.19.0') // Import the BoM for the Firebase platform
-    implementation libs.firebase.auth
     implementation libs.firebase.analytics
 
     // ============== Compose Dependencies =============

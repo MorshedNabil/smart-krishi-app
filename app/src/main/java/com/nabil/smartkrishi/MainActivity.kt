@@ -119,15 +119,6 @@ class MainActivity : ComponentActivity() {
                                 ).show()
                             },
                             onLogoutClick = {
-                                tokenManager.clearTokens()
-                                lifecycleScope.launch(Dispatchers.IO) {
-                                    try {
-                                        AppDatabase.getInstance(applicationContext).userDao().clearUsers()
-                                        Log.d("MainActivity", "Successfully cleared cached user data and secure tokens on logout")
-                                    } catch (e: Exception) {
-                                        Log.e("MainActivity", "Failed to clear cached user data on logout", e)
-                                    }
-                                }
                                 navController.navigate("login") {
                                     popUpTo(0) { inclusive = true }
                                 }

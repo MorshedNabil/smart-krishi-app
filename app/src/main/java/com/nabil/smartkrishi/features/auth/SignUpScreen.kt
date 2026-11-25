@@ -1,6 +1,8 @@
 package com.nabil.smartkrishi.features.auth
 
 import android.app.Activity
+import android.widget.Toast
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -348,6 +350,13 @@ fun SignUpScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(uiState.errorMessage) {
+        val message = uiState.errorMessage
+        if (!message.isNullOrBlank()) {
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        }
+    }
+
     val divisionsList = if (uiState.divisions.isNotEmpty()) uiState.divisions else emptyList()
     val districtsList = if (uiState.districts.isNotEmpty()) uiState.districts else emptyList()
 
@@ -496,6 +505,18 @@ fun SignUpContent(
                     SignUpButton(
                         onClick = onSignUpClick,
                         isLoading = uiState.isLoading
+                    )
+                }
+
+                // Error Message text banner if present
+                if (!uiState.errorMessage.isNullOrEmpty()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = uiState.errorMessage,
+                        color = Color(0xFFFF6B6B),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                 }
 

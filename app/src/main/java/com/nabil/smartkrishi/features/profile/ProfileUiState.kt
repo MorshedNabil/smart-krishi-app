@@ -9,6 +9,7 @@ data class ProfileUiState (
     val profileImageUri: Uri? = null,
     val isLocationDropdownExpanded: Boolean = false,
     val isLoading: Boolean = false,
+    val isLoggingOut: Boolean = false,
     val errorMessage: String? = null,
     val isSaveSuccess: Boolean = false
 )

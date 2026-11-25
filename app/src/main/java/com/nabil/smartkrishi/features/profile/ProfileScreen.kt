@@ -31,6 +31,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -399,31 +400,43 @@ fun SaveChangeButton(
 @Composable
 fun LogoutButton(
     modifier: Modifier = Modifier,
+    isLoggingOut: Boolean = false,
     onLogoutClick: () -> Unit
 ) {
     // --- Log Out Button ---
     Button(
         onClick = onLogoutClick,
-        modifier = Modifier
+        enabled = !isLoggingOut,
+        modifier = modifier
             .fillMaxWidth()
             .height(56.dp),
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFFD9534F),
-            contentColor = Color.White
+            contentColor = Color.White,
+            disabledContainerColor = Color(0xFFD9534F).copy(alpha = 0.7f),
+            disabledContentColor = Color.White
         ),
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 4.dp,
             pressedElevation = 8.dp
         )
     ) {
-        Text(
-            text = "Log Out",
-            style = TextStyle(
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold
+        if (isLoggingOut) {
+            CircularProgressIndicator(
+                color = Color.White,
+                strokeWidth = 3.dp,
+                modifier = Modifier.size(24.dp)
             )
-        )
+        } else {
+            Text(
+                text = "Log Out",
+                style = TextStyle(
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
     }
 }
 
@@ -448,7 +461,9 @@ fun ProfileScreen(
             onSaveClick(uiState)
         } ,
         onBackClick = onBackClick,
-        onLogoutClick = onLogoutClick
+        onLogoutClick = {
+            viewModel.logoutUser(onLogoutClick)
+        }
     )
 }
 
@@ -542,6 +557,7 @@ fun ProfileContent(
 
             // Logout Button
             LogoutButton(
+                isLoggingOut = uiState.isLoggingOut,
                 onLogoutClick = {
                     onLogoutClick()
                 }

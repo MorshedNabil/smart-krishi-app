@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.nabil.smartkrishi.data.local.AppDatabase;
 import com.nabil.smartkrishi.data.remote.RetrofitClient;
+import com.nabil.smartkrishi.data.remote.error.ApiErrorHandler;
 import com.nabil.smartkrishi.data.repository.UserRepository;
 import com.nabil.smartkrishi.domain.model.User;
 
@@ -141,6 +142,11 @@ public class OtpVerification extends AppCompatActivity {
         });
     }
 
+    /**
+     *  This function checks if the user is doing signup or not
+     *  If the user doing signup then api call for signup will pass the details of new user to backend and
+     *  register the new user
+     */
     private void verifyAndProceed() {
         boolean isSignup = getIntent().getBooleanExtra("is_signup", false);
         if (isSignup) {
@@ -158,17 +164,18 @@ public class OtpVerification extends AppCompatActivity {
 
             new Thread(() -> {
                 try {
-                    User user = userRepository.registerUserSync(
+                    String errorMessage = userRepository.registerUserSyncOrError(
                         firstName, lastName, phone, role, villageId, null
                     );
-                    if (user != null) {
+                    if (errorMessage == null) {
                         runOnUiThread(() -> sendToMain());
                     } else {
-                        runOnUiThread(() -> Toast.makeText(OtpVerification.this, "Registration failed. Please check your details or connection.", Toast.LENGTH_LONG).show());
+                        runOnUiThread(() -> Toast.makeText(OtpVerification.this, errorMessage, Toast.LENGTH_LONG).show());
                     }
                 } catch (Exception e) {
                     Log.e("OtpVerification", "Registration API request failed", e);
-                    runOnUiThread(() -> Toast.makeText(OtpVerification.this, "Registration failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                    String errorMsg = ApiErrorHandler.INSTANCE.getErrorMessage(e);
+                    runOnUiThread(() -> Toast.makeText(OtpVerification.this, errorMsg, Toast.LENGTH_LONG).show());
                 }
             }).start();
         } else {

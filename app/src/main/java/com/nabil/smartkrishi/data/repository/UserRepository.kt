@@ -6,14 +6,18 @@ import com.nabil.smartkrishi.data.local.entity.toDomain
 import com.nabil.smartkrishi.data.remote.ApiService
 import com.nabil.smartkrishi.data.remote.RetrofitClient
 import com.nabil.smartkrishi.data.remote.dto.LoginRequestDto
+import com.nabil.smartkrishi.data.remote.dto.RefreshTokenRequestDto
 import com.nabil.smartkrishi.data.remote.dto.SignUpRequestDto
 import com.nabil.smartkrishi.data.remote.dto.toDomain
 import com.nabil.smartkrishi.data.remote.dto.toEntity
+import com.nabil.smartkrishi.data.remote.error.ApiErrorHandler
 import com.nabil.smartkrishi.data.security.TokenManager
 import com.nabil.smartkrishi.domain.model.User
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 /**
  * Repository acting as Single Source of Truth (SSOT) for User data.
@@ -55,7 +59,7 @@ class UserRepository @JvmOverloads constructor(
      * Fetches current user profile from GET /auth/accounts/me/ API and caches it into Room DB.
      */
     suspend fun refreshUserProfile(): Result<User> {
-        return com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.safeApiCall {
+        return ApiErrorHandler.safeApiCall {
             safeLogD("Fetching user profile from API")
             val response = apiService.getUserProfile()
             val userDto = response.user ?: throw Exception("User object is null in API response")
@@ -76,7 +80,7 @@ class UserRepository @JvmOverloads constructor(
      * stores JWT access token, and caches the user profile in Room DB.
      */
     suspend fun loginUser(phone: String, password: String): Result<User> {
-        return com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.safeApiCall {
+        return ApiErrorHandler.safeApiCall {
             safeLogD("Logging in user with phone: $phone")
             val requestDto = LoginRequestDto(
                 phoneNumber = phone,
@@ -120,7 +124,7 @@ class UserRepository @JvmOverloads constructor(
         villageId: Int,
         profileImage: String? = null
     ): Result<User> {
-        return com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.safeApiCall {
+        return ApiErrorHandler.safeApiCall {
             safeLogD("Registering user with phone: $phone")
             val requestDto = SignUpRequestDto(
                 firstName = firstName,
@@ -146,16 +150,58 @@ class UserRepository @JvmOverloads constructor(
     }
 
     /**
-     * Synchronous blocking wrapper for registerUser, useful for Java interoperability (e.g. OtpVerification).
+     * Synchronous blocking wrapper for registerUser, returning null on success,
+     * or a human-readable error message String on failure (useful for Java interoperability like OtpVerification).
      */
-    fun registerUserSync(
+    fun registerUserSyncOrError(
         firstName: String,
         lastName: String,
         phone: String,
         role: String,
         villageId: Int,
         profileImage: String? = null
-    ): User? = runBlocking {
-        registerUser(firstName, lastName, phone, role, villageId, profileImage).getOrNull()
+    ): String? = runBlocking {
+        val result = registerUser(firstName, lastName, phone, role, villageId, profileImage)
+        if (result.isSuccess) {
+            null
+        } else {
+            ApiErrorHandler.getErrorMessage(result.exceptionOrNull())
+        }
+    }
+
+    /**
+     * Calls POST /auth/accounts/logout/ API with the refresh token to blacklist it on the server,
+     * clears tokens from EncryptedSharedPreferences (TokenManager), resets RetrofitClient.authToken,
+     * and clears cached user profile from Room DB.
+     * Runs on Dispatchers.IO to prevent main thread blocking during EncryptedSharedPreferences crypto & disk I/O.
+     */
+    suspend fun logoutUser(): Result<Unit> = withContext(Dispatchers.IO) {
+        val refreshToken = tokenManager?.getRefreshToken()
+        safeLogD("Logging out user, refreshToken present: ${!refreshToken.isNullOrBlank()}")
+
+        // Clear local tokens and memory session immediately
+        tokenManager?.clearTokens()
+        RetrofitClient.authToken = null
+
+        // Clear cached user profile from Room DB
+        try {
+            userDao.clearUsers()
+            safeLogD("Successfully cleared local user session and database cache")
+        } catch (e: Exception) {
+            safeLogE("Failed to clear local UserDao on logout", e)
+        }
+
+        // Notify backend server to blacklist the refresh token
+        if (!refreshToken.isNullOrBlank()) {
+            try {
+                val requestDto = RefreshTokenRequestDto(refresh = refreshToken)
+                apiService.logoutUser(requestDto)
+                safeLogD("Successfully blacklisted JWT refresh token on backend")
+            } catch (e: Exception) {
+                safeLogE("Backend logout API call failed (token still cleared locally)", e)
+            }
+        }
+
+        Result.success(Unit)
     }
 }

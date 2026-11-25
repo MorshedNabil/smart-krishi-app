@@ -52,6 +52,10 @@ interface ApiService {
     @POST("auth/accounts/login/")
     suspend fun loginUser(@Body request: LoginRequestDto): LoginResponseDto
 
+    // API for user logout (blacklists the refresh token on the server)
+    @POST("auth/accounts/logout/")
+    suspend fun logoutUser(@Body request: RefreshTokenRequestDto): Response<Unit>
+
     // API for refreshing access token using refresh token
     @POST("api/token/refresh/")
     fun refreshToken(@Body request: RefreshTokenRequestDto): Call<RefreshTokenResponseDto>

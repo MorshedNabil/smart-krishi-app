@@ -100,7 +100,9 @@ class HomeViewModel(
             result.onSuccess { priceData ->
                 _uiState.value = HomeUiState.Success(priceData)
             }.onFailure { exception ->
-                _uiState.value = HomeUiState.Error(exception.message ?: "Failed to load market prices")
+                _uiState.value = HomeUiState.Error(
+                    com.nabil.smartkrishi.data.remote.error.ApiErrorHandler.getErrorMessage(exception)
+                )
             }
         }
     }
